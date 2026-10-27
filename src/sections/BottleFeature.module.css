@@ -1,6 +1,8 @@
 .section {
+  --stage-from: var(--forest-800);
+  --stage-to: var(--forest-900);
   position: relative;
-  background: var(--forest-900);
+  background: var(--stage-to);
 }
 .stage {
   position: relative;
@@ -8,7 +10,7 @@
   height: 100svh;
   overflow: hidden;
   overflow: clip;
-  background: radial-gradient(90% 70% at 50% 55%, var(--forest-800), var(--forest-900) 70%);
+  background: radial-gradient(90% 70% at 50% 55%, var(--stage-from), var(--stage-to) 70%);
 }
 .mist {
   position: absolute;
@@ -17,7 +19,7 @@
   pointer-events: none;
   background:
     radial-gradient(70% 45% at 50% 85%, rgba(200, 204, 190, 0.5), transparent 70%),
-    linear-gradient(180deg, var(--forest-900) 0%, rgba(12, 26, 20, 0) 40%);
+    linear-gradient(180deg, var(--stage-to) 0%, transparent 40%);
 }
 .halo {
   position: absolute;
@@ -110,7 +112,7 @@
   opacity: 1;
 }
 .section[data-mode="simple"] .mist {
-  background: linear-gradient(180deg, var(--forest-900), transparent 35%);
+  background: linear-gradient(180deg, var(--stage-to), transparent 35%);
 }
 .section[data-mode="simple"] .stack {
   display: grid;

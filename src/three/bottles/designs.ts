@@ -144,7 +144,7 @@ function vaultLiquid(segments: number) {
     const t = smoothstep(0.2, 1.7, y);
     return t < 0.5 ? amber.clone().lerp(red, t * 2) : red.clone().lerp(burgundy, (t - 0.5) * 2);
   };
-  return loft([...sample(vaultLiquidSection, 0.19, V.body, 10), ...sample(vaultLiquidSection, V.body + 0.014, 2.17, 16)], { segments, color: colour });
+  return loft([...sample(vaultLiquidSection, 0.19, V.body, 10), ...sample(vaultLiquidSection, V.body + 0.014, 2.255, 18)], { segments, color: colour });
 }
 
 export const vaultSeries: BottleDesign = {

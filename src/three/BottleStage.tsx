@@ -11,6 +11,8 @@ import { TransmissionBackdrop } from "./useTransmissionBackdrop";
 
 type Props = {
   expression: Expression;
+  /** Room tone behind the canvas, refracted by clear glass. */
+  backdrop: string;
   progress: RefObject<number>;
   quality: Quality;
   mode: "scroll" | "static";
@@ -24,7 +26,7 @@ type Props = {
  * lighting from procedural light-formers tinted to the expression (no HDR
  * download). Dragging the stage turns the bottle.
  */
-export default function BottleStage({ expression, progress, quality, mode, idle, className }: Props) {
+export default function BottleStage({ expression, backdrop, progress, quality, mode, idle, className }: Props) {
   const host = useRef<HTMLDivElement>(null);
   const [near, setNear] = useState(false);
   const [visible, setVisible] = useState(false);
@@ -52,7 +54,7 @@ export default function BottleStage({ expression, progress, quality, mode, idle,
           gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
           aria-hidden="true"
         >
-          <TransmissionBackdrop color="#0f2119" />
+          <TransmissionBackdrop color={backdrop} />
           <ambientLight intensity={0.18} />
           <spotLight position={[-4, 5, 3]} angle={0.4} penumbra={1} intensity={60} color={light.key} />
           <spotLight position={[4, 2, -3]} angle={0.5} penumbra={1} intensity={55} color={light.rim} />

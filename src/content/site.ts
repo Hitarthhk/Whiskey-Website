@@ -147,6 +147,8 @@ export type Expression = {
   liquid: string;
   /** Room tint while this expression is selected. */
   accent: string;
+  /** Showcase room: centre and edge of its radial light. */
+  stage: [string, string];
   /** Visual theme supplied by the brand. */
   theme: { name: string; colors: string[] };
   /** Reference photograph: lightweight fallback when WebGL is unavailable. */
@@ -167,6 +169,7 @@ export const expressions: Expression[] = [
     descriptor: "Demerara, dates and dried ginger",
     liquid: "#b5621a",
     accent: "#0f3326",
+    stage: ["#12261d", "#0c1a14"],
     theme: { name: "Deep emerald, antique gold and amber", colors: ["#0f3326", "#b08a43", "#b5621a"] },
     image: { src: "/media/bottles/private-edition-i.webp", alt: "Gamber Valley Private Edition I decanter", width: 900, height: 1037 },
     notes: {
@@ -186,6 +189,7 @@ export const expressions: Expression[] = [
     descriptor: "Honey, chocolate and soft vanilla",
     liquid: "#7a1f2b",
     accent: "#331219",
+    stage: ["#2a1218", "#14090c"],
     theme: { name: "Deep burgundy, muted rose, warm amber and gold", colors: ["#4a1420", "#c99299", "#c27a2c", "#c9a45c"] },
     image: { src: "/media/bottles/the-vault-series.webp", alt: "Gamber Valley The Vault Series bottle", width: 329, height: 1200 },
     notes: {

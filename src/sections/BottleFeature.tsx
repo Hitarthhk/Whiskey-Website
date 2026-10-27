@@ -103,7 +103,13 @@ export function BottleFeature({ expression = expressionById("private-edition-i")
   const [s0, s1, s2] = expression.showcase;
 
   return (
-    <section ref={ref} className={styles.section} data-mode={cinematic ? "cinematic" : "simple"} aria-label={expression.name}>
+    <section
+      ref={ref}
+      className={styles.section}
+      data-mode={cinematic ? "cinematic" : "simple"}
+      aria-label={expression.name}
+      style={{ "--stage-from": expression.stage[0], "--stage-to": expression.stage[1] } as React.CSSProperties}
+    >
       <div data-stage className={styles.stage}>
         <div data-mist className={styles.mist} aria-hidden="true" />
         <div data-halo className={styles.halo} aria-hidden="true" />
@@ -116,7 +122,7 @@ export function BottleFeature({ expression = expressionById("private-edition-i")
         <div className={styles.object}>
           {use3D ? (
             <WebGLBoundary onError={() => setGpuFailed(true)} fallback={<div className={styles.flat}><ProductImage expression={expression} className={styles.svg} /></div>}>
-              <BottleStage expression={expression} progress={progress} quality={quality} mode={mode} idle={!reduced} className={styles.canvas} />
+              <BottleStage expression={expression} backdrop={expression.stage[0]} progress={progress} quality={quality} mode={mode} idle={!reduced} className={styles.canvas} />
             </WebGLBoundary>
           ) : (
             <div data-bottle-2d className={styles.flat}>
