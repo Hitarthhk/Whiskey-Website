@@ -6,7 +6,7 @@ import { EASE, gsap, Reveal, SplitText, useMotion, useScene } from "@/animation"
 import { BottleSVG } from "@/components/BottleSVG";
 import { WebGLBoundary } from "@/components/WebGLBoundary";
 import { ClaimText, PendingTag } from "@/components/Pending";
-import { bottleFeature } from "@/content/site";
+import { expressionById, type Expression } from "@/content/site";
 import styles from "./BottleFeature.module.css";
 
 const BottleStage = dynamic(() => import("@/three/BottleStage"), { ssr: false });
@@ -17,7 +17,7 @@ const BottleStage = dynamic(() => import("@/three/BottleStage"), { ssr: false })
  * Desktop with WebGL gets the 3D bottle; everything else gets the SVG bottle
  * driven by the same timeline, or a calm stacked layout on phones.
  */
-export function BottleFeature() {
+export function BottleFeature({ expression = expressionById("private-edition-i") }: { expression?: Expression }) {
   const ref = useRef<HTMLElement>(null);
   const progress = useRef(0);
   const { ready, reduced, mobile, webgl } = useMotion();
@@ -101,10 +101,10 @@ export function BottleFeature() {
     [use3D],
   );
 
-  const [s0, s1, s2] = bottleFeature.steps;
+  const [s0, s1, s2] = expression.showcase;
 
   return (
-    <section ref={ref} className={styles.section} data-mode={cinematic ? "cinematic" : "simple"} aria-label="The bottle">
+    <section ref={ref} className={styles.section} data-mode={cinematic ? "cinematic" : "simple"} aria-label={expression.name}>
       <div data-stage className={styles.stage}>
         <div data-mist className={styles.mist} aria-hidden="true" />
         <div data-halo className={styles.halo} aria-hidden="true" />
@@ -148,7 +148,7 @@ export function BottleFeature() {
 
       {/* Stacked copy for phones and reduced motion */}
       <Reveal className={styles.stack} stagger={0.12}>
-        {bottleFeature.steps.map((s) => (
+        {expression.showcase.map((s) => (
           <div key={s.kicker} data-reveal className={styles.stackItem}>
             <p className="eyebrow">{s.kicker}</p>
             <h2 className={`display ${styles.title}`}>{s.title}</h2>

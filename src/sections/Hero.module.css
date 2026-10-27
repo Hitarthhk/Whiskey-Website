@@ -32,10 +32,11 @@
   text-align: center;
 }
 .title {
-  font-size: clamp(54px, 10.5vw, 172px);
+  font-size: clamp(44px, 7.6vw, 132px);
   color: var(--ivory);
 }
 .title em {
+  display: block;
   font-style: italic;
   color: var(--gold-bright);
 }

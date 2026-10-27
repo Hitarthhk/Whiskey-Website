@@ -106,7 +106,7 @@ export function Hero() {
             {hero.eyebrow}
           </p>
           <h1 id="hero-title" data-headline className={`display ${styles.title}`} style={{ visibility: "hidden" }}>
-            Born in the <em>Himalayas</em>
+            {hero.headline[0]} <em>{hero.headline[1]}</em>
           </h1>
           <p data-intro className={`lede ${styles.sub}`}>
             {hero.sub}

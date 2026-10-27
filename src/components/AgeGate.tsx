@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useRef, useState, type ReactNode 
 import { usePathname } from "next/navigation";
 import { EASE, gsap, useMotion } from "@/animation";
 import { useScrollLock } from "./useScrollLock";
-import { brand } from "@/content/site";
+import { brand, informationPages } from "@/content/site";
 import { MountainMark } from "./MountainMark";
 import styles from "./AgeGate.module.css";
 
@@ -30,7 +30,7 @@ function readVerified() {
  */
 export function AgeGate({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const informationPage = ["/terms", "/privacy", "/responsible-drinking"].includes(pathname);
+  const informationPage = informationPages.includes(pathname);
   const [status, setStatus] = useState<Status>("checking");
   const [remember, setRemember] = useState(false);
   const panel = useRef<HTMLDivElement>(null);

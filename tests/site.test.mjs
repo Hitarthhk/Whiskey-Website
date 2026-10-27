@@ -31,7 +31,7 @@ after(async () => {
   }
 });
 
-for (const route of ["/", "/story", "/craft", "/collection", "/terms", "/privacy", "/responsible-drinking"]) {
+for (const route of ["/", "/story", "/craft", "/whisky", "/contact", "/terms", "/privacy", "/responsible-drinking"]) {
   test(`production route ${route} serves HTML with usable navigation`, async () => {
     const response = await fetch(origin + route);
     assert.equal(response.status, 200);
@@ -51,4 +51,15 @@ for (const route of ["/", "/story", "/craft", "/collection", "/terms", "/privacy
 
 test("unknown routes return an actual 404", async () => {
   assert.equal((await fetch(origin + "/missing-review-route")).status, 404);
+});
+
+test("the retired /collection route permanently redirects to /whisky", async () => {
+  const response = await fetch(origin + "/collection", { redirect: "manual" });
+  assert.equal(response.status, 308);
+  assert.equal(new URL(response.headers.get("location"), origin).pathname, "/whisky");
+});
+
+test("primary navigation lists the five pages", async () => {
+  const html = await (await fetch(origin + "/")).text();
+  for (const href of ["/story", "/craft", "/whisky", "/contact"]) assert.ok(html.includes(`href="${href}"`), href);
 });

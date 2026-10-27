@@ -1,64 +1,83 @@
 /**
  * All brand copy lives here so it can be edited without touching components.
  *
- * `verified: false` marks any statement that reads as a factual production
- * claim. These render with a small "pending verification" tag and must be
- * confirmed by Gamber Valley before launch. Product names and specifications
- * are deliberately placeholders — none have been invented.
+ * Everything below comes from information supplied by the brand. `verified:
+ * false` marks any statement that reads as a production claim the brand has
+ * not yet confirmed; those render with a visible "pending verification" tag.
+ * No dates, awards, specifications or contact details have been invented —
+ * ABV, age statements and cask details stay out of the interface until
+ * verified.
  */
 
 export type Claim = { text: string; verified: boolean };
 
 export const brand = {
   name: "Gamber Valley",
+  company: "Alcobrew Distilleries India Limited",
   category: "Indian Single Malt Whisky",
-  tagline: "Born in the Himalayas",
+  tagline: "Born of Altitude. Refined by Attitude.",
+  origin: "Solan, Himachal Pradesh, India",
+  originShort: "Solan, Himachal Pradesh",
+  philosophy: ["Patience", "Craftsmanship", "Authenticity"],
+  identity: "Himalayan monal and rhododendron",
+  emblem: { src: "/media/brand/gamber-valley-emblem.png", width: 1024, height: 680 },
   responsibility: "Enjoy responsibly. For adults of legal drinking age only.",
 };
 
 export const hero = {
-  eyebrow: "Indian Single Malt Whisky",
-  headline: "Born in the Himalayas",
-  sub: "An expedition into altitude, patience and light.",
+  eyebrow: `${brand.category} · ${brand.originShort}`,
+  headline: ["Born of Altitude.", "Refined by Attitude."] as const,
+  sub: "An Indian single malt inspired by the Himalayan landscape and heritage of Solan.",
 };
 
-export const bottleFeature = {
-  steps: [
+export type Chapter = { numeral: string; title: string; body: Claim };
+export type ChapterSet = { intro: string; chapters: Chapter[] };
+
+/** Homepage: the short origin story. */
+export const origin: ChapterSet = {
+  intro: "Our Origin",
+  chapters: [
     {
-      kicker: "The Spirit",
-      title: "Shaped by altitude",
-      body: { text: "A single malt that carries the mountain air in every measure — cool nights, warm days, and time.", verified: false },
+      numeral: "I",
+      title: "The Foothills",
+      body: { text: "Gamber Valley begins in Solan, in the Himalayan foothills of Himachal Pradesh — a landscape of ridgelines, pine and mountain light.", verified: true },
     },
     {
-      kicker: "The Character",
-      title: "Gold, drawn from the valley",
-      body: { text: "Colour, nose and finish to be described by the master blender. Placeholder copy.", verified: false },
+      numeral: "II",
+      title: "The Emblem",
+      body: { text: "The Himalayan monal and the rhododendron stand at the heart of our identity: two emblems of the mountains that inspire every bottle.", verified: true },
     },
     {
-      kicker: "The Vessel",
-      title: "Crafted to be kept",
-      body: { text: "Bottle design shown is a conceptual 3D placeholder until final packaging assets are supplied.", verified: true },
+      numeral: "III",
+      title: "The Philosophy",
+      body: { text: "Patience, craftsmanship and authenticity. The valley sets the pace, and the whisky is ready only when it is ready.", verified: true },
     },
   ],
 };
 
-export const story = {
+/** Our Story page: the fuller account. */
+export const story: ChapterSet = {
   intro: "Our Story",
   chapters: [
     {
       numeral: "I",
-      title: "The Source",
-      body: { text: "High above the plains, snowmelt gathers into streams that feed the valley below. Here the story begins.", verified: false },
+      title: "Solan",
+      body: { text: "Our story is rooted in Solan, Himachal Pradesh, where the Himalayan foothills rise above the plains and the seasons are written in the hills.", verified: true },
     },
     {
       numeral: "II",
-      title: "The Climate",
-      body: { text: "Mountain seasons swing between extremes, and the spirit answers each one as it rests in oak.", verified: false },
+      title: "The Monal",
+      body: { text: "The Himalayan monal, crowned and iridescent, appears on every Gamber Valley bottle — a mark of the altitude we are born of.", verified: true },
     },
     {
       numeral: "III",
-      title: "The Patience",
-      body: { text: "Nothing here is hurried. The valley sets the pace, and the whisky is ready only when it is ready.", verified: false },
+      title: "The Rhododendron",
+      body: { text: "Above the monals blooms the rhododendron, a flower of the high slopes and the second emblem of the Gamber Valley identity.", verified: true },
+    },
+    {
+      numeral: "IV",
+      title: "The Attitude",
+      body: { text: `Patience, craftsmanship and authenticity guide everything we make. Gamber Valley is crafted by ${brand.company}.`, verified: true },
     },
   ],
 };
@@ -75,15 +94,17 @@ export type CraftScene = {
   hotspots: Hotspot[];
 };
 
-export const craft: { intro: string; scenes: CraftScene[] } = {
-  intro: "Craftsmanship",
+export const craft: { intro: string; heading: string; lede: string; scenes: CraftScene[] } = {
+  intro: "Our Craft",
+  heading: "From fire, grain and oak",
+  lede: "Patience and craftsmanship, stage by stage. Scenes are illustrated until the distillery’s own photography and verified production details are supplied.",
   scenes: [
     {
       id: "copper",
       index: "01",
       title: "Copper & Fire",
       lede: "Where wash becomes spirit.",
-      mediaNote: "Placeholder — cinematic close-up of copper pot stills",
+      mediaNote: "Illustration — distillery photography to follow",
       hotspots: [
         { id: "pot", x: 38, y: 58, title: "Pot still", body: { text: "Still type, count and capacity to be confirmed by the distillery.", verified: false } },
         { id: "neck", x: 62, y: 26, title: "Swan neck", body: { text: "Neck shape influences reflux and spirit character. Specifics pending.", verified: false } },
@@ -94,7 +115,7 @@ export const craft: { intro: string; scenes: CraftScene[] } = {
       index: "02",
       title: "Malted Barley",
       lede: "The single grain at the heart of a single malt.",
-      mediaNote: "Placeholder — macro photography of malted barley",
+      mediaNote: "Illustration — barley photography to follow",
       hotspots: [
         { id: "barley", x: 46, y: 44, title: "The grain", body: { text: "Barley origin and malting details to be supplied.", verified: false } },
         { id: "water", x: 72, y: 70, title: "Mountain water", body: { text: "Water source description pending brand verification.", verified: false } },
@@ -105,7 +126,7 @@ export const craft: { intro: string; scenes: CraftScene[] } = {
       index: "03",
       title: "Oak & Time",
       lede: "The valley’s climate works on every cask.",
-      mediaNote: "Placeholder — warehouse of resting oak casks",
+      mediaNote: "Illustration — warehouse photography to follow",
       hotspots: [
         { id: "cask", x: 34, y: 50, title: "Cask types", body: { text: "Cask types and previous fills to be confirmed.", verified: false } },
         { id: "climate", x: 68, y: 32, title: "Maturation", body: { text: "Maturation conditions and any age statements pending verification.", verified: false } },
@@ -114,42 +135,96 @@ export const craft: { intro: string; scenes: CraftScene[] } = {
   ],
 };
 
+export type ShowcaseStep = { kicker: string; title: string; body: Claim };
+export type ExpressionId = "private-edition-i" | "the-vault-series";
+
 export type Expression = {
-  id: string;
+  id: ExpressionId;
   name: string;
+  /** One line drawn from the supplied tasting notes. */
   descriptor: string;
+  /** Liquid tone used for 2D glows. */
   liquid: string;
+  /** Room tint while this expression is selected. */
   accent: string;
-  /** Path to a supplied GLB model. When present the card upgrades to real 3D rotation. */
+  /** Visual theme supplied by the brand. */
+  theme: { name: string; colors: string[] };
+  /** Reference photograph: lightweight fallback when WebGL is unavailable. */
+  image: { src: string; alt: string; width: number; height: number };
+  /** Optional accurate GLB. When present it replaces the procedural model. */
   model?: string;
   notes: { nose: string; palate: string; finish: string };
-  specs: { label: string; value: string }[];
+  /** Exactly three beats — the showcase choreography is timed to them. */
+  showcase: [ShowcaseStep, ShowcaseStep, ShowcaseStep];
 };
 
-const pendingNotes = {
-  nose: "To be supplied by the master blender.",
-  palate: "To be supplied by the master blender.",
-  finish: "To be supplied by the master blender.",
-};
-const pendingSpecs = [
-  { label: "ABV", value: "TBC" },
-  { label: "Volume", value: "TBC" },
-  { label: "Cask", value: "TBC" },
+const supplied = (text: string): Claim => ({ text, verified: true });
+
+export const expressions: Expression[] = [
+  {
+    id: "private-edition-i",
+    name: "Private Edition I",
+    descriptor: "Demerara, dates and dried ginger",
+    liquid: "#b5621a",
+    accent: "#0f3326",
+    theme: { name: "Deep emerald, antique gold and amber", colors: ["#0f3326", "#b08a43", "#b5621a"] },
+    image: { src: "/media/bottles/private-edition-i.webp", alt: "Gamber Valley Private Edition I decanter", width: 900, height: 839 },
+    notes: {
+      nose: "Demerara sugar, dates, honey, vanilla, eucalyptus and lavender.",
+      palate: "Rich malt, dried ginger and gentle spice.",
+      finish: "Gentle warmth and lingering complexity.",
+    },
+    showcase: [
+      { kicker: "Private Edition I", title: "Born of Altitude", body: supplied("An Indian single malt inspired by the Himalayan landscape and heritage of Solan.") },
+      { kicker: "The Nose", title: "Demerara, dates and honey", body: supplied("Demerara sugar, dates, honey, vanilla, eucalyptus and lavender.") },
+      { kicker: "Palate & Finish", title: "Rich malt, gentle spice", body: supplied("Rich malt, dried ginger and gentle spice, settling into gentle warmth and lingering complexity.") },
+    ],
+  },
+  {
+    id: "the-vault-series",
+    name: "The Vault Series",
+    descriptor: "Honey, chocolate and soft vanilla",
+    liquid: "#7a1f2b",
+    accent: "#331219",
+    theme: { name: "Deep burgundy, muted rose, warm amber and gold", colors: ["#4a1420", "#c99299", "#c27a2c", "#c9a45c"] },
+    image: { src: "/media/bottles/the-vault-series.webp", alt: "Gamber Valley The Vault Series bottle", width: 520, height: 1900 },
+    notes: {
+      nose: "Delicate malt and soft vanilla.",
+      palate: "Honey, chocolate and subtle spice.",
+      finish: "Long, refined, with honey and chocolate.",
+    },
+    showcase: [
+      { kicker: "The Vault Series", title: "Refined by Attitude", body: supplied("Patience, craftsmanship and authenticity, held in reserve.") },
+      { kicker: "The Nose", title: "Delicate malt, soft vanilla", body: supplied("Delicate malt and soft vanilla.") },
+      { kicker: "Palate & Finish", title: "Honey and chocolate", body: supplied("Honey, chocolate and subtle spice, with a long, refined finish of honey and chocolate.") },
+    ],
+  },
 ];
 
-export const collection: { intro: string; expressions: Expression[] } = {
-  intro: "The Collection",
-  expressions: [
-    { id: "exp-1", name: "Expression I", descriptor: "Name pending", liquid: "#c7852b", accent: "#173027", notes: pendingNotes, specs: pendingSpecs },
-    { id: "exp-2", name: "Expression II", descriptor: "Name pending", liquid: "#a85e1c", accent: "#2a2116", notes: pendingNotes, specs: pendingSpecs },
-    { id: "exp-3", name: "Expression III", descriptor: "Name pending", liquid: "#8a3f16", accent: "#2b1714", notes: pendingNotes, specs: pendingSpecs },
-    { id: "exp-4", name: "Expression IV", descriptor: "Name pending", liquid: "#d39a3e", accent: "#1d2a2c", notes: pendingNotes, specs: pendingSpecs },
-  ],
+export const expressionById = (id: ExpressionId) => expressions.find((e) => e.id === id)!;
+
+export const collection = {
+  intro: "Our Whisky",
+  heading: "Two expressions",
+  expressions,
+};
+
+export const contact = {
+  intro: "Contact",
+  heading: "Write to the valley",
+  lede: "For trade, press and partnership enquiries about Gamber Valley.",
+  enquiryTypes: ["General enquiry", "Trade & distribution", "Press & media", "Partnerships"],
+  /** No address, email or phone has been supplied — none is shown. */
+  pendingDetails: "Direct contact details will be published at launch.",
 };
 
 export const nav = [
   { href: "/", label: "Home" },
   { href: "/story", label: "Our Story" },
-  { href: "/craft", label: "Craftsmanship" },
-  { href: "/collection", label: "Collection" },
+  { href: "/craft", label: "Our Craft" },
+  { href: "/whisky", label: "Our Whisky" },
+  { href: "/contact", label: "Contact" },
 ];
+
+/** Pages readable before age confirmation. */
+export const informationPages = ["/terms", "/privacy", "/responsible-drinking"];

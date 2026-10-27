@@ -4,12 +4,12 @@ import { Closing } from "@/sections/Closing";
 import { Craft } from "@/sections/Craft";
 import { PageIntro } from "@/sections/PageIntro";
 
-export const metadata: Metadata = { title: "Craftsmanship — Gamber Valley" };
+export const metadata: Metadata = { title: "Our Craft — Gamber Valley" };
 
 export default function CraftPage() {
   return (
     <>
-      <PageIntro eyebrow="Craftsmanship" title="Made by hand and season" palette={dawn} id="craft-intro" />
+      <PageIntro eyebrow="Our Craft" title="Made with patience" palette={dawn} id="craft-intro" />
       <Craft />
       <Closing />
     </>

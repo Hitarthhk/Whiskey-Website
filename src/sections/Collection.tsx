@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from "react";
 import { EASE, gsap, ScrollTrigger, SplitText, useLenis, useMotion, useScene } from "@/animation";
 import { BottleSVG } from "@/components/BottleSVG";
 import { Button } from "@/components/Button";
-import { PendingTag } from "@/components/Pending";
 import { collection, type Expression } from "@/content/site";
 import styles from "./Collection.module.css";
 
@@ -88,13 +87,13 @@ export function Collection({ headingLevel = 2, showCta = true }: { headingLevel?
         <div ref={details} className={styles.details} aria-live="polite">
           <p className="eyebrow">{collection.intro}</p>
           <Heading id="collection-title" className="visually-hidden">
-            {collection.intro}
+            {collection.heading}
           </Heading>
           <h3 key={exp.id} data-name className={`display ${styles.name}`}>
             {exp.name}
           </h3>
           <p data-detail className={styles.descriptor}>
-            {exp.descriptor} <PendingTag>Placeholder</PendingTag>
+            {exp.descriptor}
           </p>
           <dl data-detail className={styles.notes}>
             {(["nose", "palate", "finish"] as const).map((k) => (
@@ -104,17 +103,9 @@ export function Collection({ headingLevel = 2, showCta = true }: { headingLevel?
               </div>
             ))}
           </dl>
-          <dl data-detail className={styles.specs}>
-            {exp.specs.map((s) => (
-              <div key={s.label}>
-                <dt>{s.label}</dt>
-                <dd>{s.value}</dd>
-              </div>
-            ))}
-          </dl>
           {showCta && (
             <div data-detail className={styles.ctas}>
-              <Button href="/collection" variant="solid">Discover</Button>
+              <Button href="/whisky" variant="solid">Discover</Button>
               <Button href="/story">Our Story</Button>
             </div>
           )}

@@ -103,10 +103,10 @@ export function Craft({ headingLevel = 2 }: { headingLevel?: 1 | 2 }) {
       <header className={styles.header}>
         <p className="eyebrow">{craft.intro}</p>
         <Heading id="craft-title" className={`display ${styles.heading}`}>
-          <SplitReveal as="span" type="words">From fire, grain and oak</SplitReveal>
+          <SplitReveal as="span" type="words">{craft.heading}</SplitReveal>
         </Heading>
         <SplitReveal className="lede" delay={0.2}>
-          Every stage is shown here as a placeholder scene until the distillery’s own photography and verified details are supplied.
+          {craft.lede}
         </SplitReveal>
       </header>
 

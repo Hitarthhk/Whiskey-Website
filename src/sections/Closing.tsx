@@ -30,8 +30,8 @@ export function Closing() {
           Some places cannot be hurried.
         </SplitReveal>
         <div className={styles.ctas}>
-          <Button href="/collection" variant="solid" cursor="Explore">
-            Explore the Collection
+          <Button href="/whisky" variant="solid" cursor="Explore">
+            Discover Our Whisky
           </Button>
           <Button href="/story">Read Our Story</Button>
         </div>

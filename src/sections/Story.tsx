@@ -5,7 +5,7 @@ import { EASE, gsap, SplitText, useMotion, useScene } from "@/animation";
 import { Landscape } from "@/components/landscape/Landscape";
 import { dusk } from "@/components/landscape/palettes";
 import { ClaimText } from "@/components/Pending";
-import { story } from "@/content/site";
+import { story, type ChapterSet } from "@/content/site";
 import styles from "./Story.module.css";
 
 /**
@@ -13,7 +13,7 @@ import styles from "./Story.module.css";
  * camera trucks sideways and each chapter is set in type, then cleared.
  * On phones the valley stays as a sticky backdrop and chapters scroll over it.
  */
-export function Story({ headingLevel = 2 }: { headingLevel?: 1 | 2 }) {
+export function Story({ headingLevel = 2, content = story }: { headingLevel?: 1 | 2; content?: ChapterSet }) {
   const ref = useRef<HTMLElement>(null);
   const { ready, reduced, mobile } = useMotion();
   const cinematic = !ready || (!reduced && !mobile);
@@ -79,20 +79,20 @@ export function Story({ headingLevel = 2 }: { headingLevel?: 1 | 2 }) {
         <div data-sweep className={styles.sweep} aria-hidden="true" />
         <div className={styles.shade} aria-hidden="true" />
         <Heading id="story-title" className={`eyebrow ${styles.label}`}>
-          {story.intro}
+          {content.intro}
         </Heading>
-        <ol className={styles.ticks} aria-hidden="true">
+        <div className={styles.ticks} aria-hidden="true">
           <span data-progress className={styles.progress} />
-          {story.chapters.map((c) => (
-            <li key={c.numeral} data-tick>
+          {content.chapters.map((c) => (
+            <span key={c.numeral} data-tick>
               {c.numeral}
-            </li>
+            </span>
           ))}
-        </ol>
+        </div>
       </div>
 
       <div className={styles.chapters}>
-        {story.chapters.map((c) => (
+        {content.chapters.map((c) => (
           <article key={c.numeral} data-chapter className={styles.chapter}>
             <span data-chapter-numeral data-chapter-item className={`display ${styles.numeral}`} aria-hidden="true">
               {c.numeral}

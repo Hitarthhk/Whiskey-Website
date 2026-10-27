@@ -9,7 +9,7 @@ export const metadata: Metadata = { title: "Our Story — Gamber Valley" };
 export default function StoryPage() {
   return (
     <>
-      <PageIntro eyebrow="Our Story" title="A valley of patience" palette={dusk} id="story-intro" />
+      <PageIntro eyebrow="Our Story" title="Rooted in Solan" palette={dusk} id="story-intro" />
       <Story />
       <Closing />
     </>
