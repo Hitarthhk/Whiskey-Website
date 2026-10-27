@@ -3,8 +3,7 @@
 import { useRef } from "react";
 import { EASE, gsap, SplitText, useScene } from "@/animation";
 import { useEntered } from "@/components/AgeGate";
-import { Landscape } from "@/components/landscape/Landscape";
-import { dawn } from "@/components/landscape/palettes";
+import { HimalayaLandscape } from "@/components/landscape/HimalayaLandscape";
 import { hero } from "@/content/site";
 import styles from "./Hero.module.css";
 
@@ -99,7 +98,7 @@ export function Hero() {
   return (
     <section ref={ref} className={styles.hero} aria-labelledby="hero-title">
       <div data-stage className={styles.stage}>
-        <Landscape palette={dawn} id="hero" />
+        <HimalayaLandscape />
         <div className={styles.vignette} aria-hidden="true" />
         <div data-copy className={styles.copy}>
           <p data-intro className="eyebrow">
