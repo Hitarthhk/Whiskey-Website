@@ -1,19 +1,19 @@
 import { BottleFeature } from "@/sections/BottleFeature";
-import { Closing } from "@/sections/Closing";
 import { Collection } from "@/sections/Collection";
-import { Craft } from "@/sections/Craft";
+import { Contact } from "@/sections/Contact";
 import { Hero } from "@/sections/Hero";
 import { Story } from "@/sections/Story";
+import { origin } from "@/content/site";
 
+/** Hero → Our Origin → Bottle Collection → Individual Bottle Showcase → Contact. */
 export default function Home() {
   return (
     <>
       <Hero />
-      <BottleFeature />
-      <Story />
-      <Craft />
+      <Story content={origin} />
       <Collection />
-      <Closing />
+      <BottleFeature />
+      <Contact />
     </>
   );
 }

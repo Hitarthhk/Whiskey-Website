@@ -1,66 +1,44 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
-import { EASE, gsap, ScrollTrigger, SplitText, useLenis, useMotion, useScene } from "@/animation";
+import { EASE, gsap, SplitText, useMotion, useScene } from "@/animation";
 import { BottleSVG } from "@/components/BottleSVG";
 import { Button } from "@/components/Button";
 import { collection, type Expression } from "@/content/site";
 import styles from "./Collection.module.css";
 
-const ProductModel = dynamic(() => import("@/three/ProductModel"), { ssr: false });
-
 /**
- * Horizontal gallery. On desktop vertical scroll drives the track while the
- * details panel stays put; on phones it is a native swipe carousel.
- * Selecting a bottle re-tints the room and re-sets the details in type.
+ * Two-bottle presentation. The pair stands side by side next to a details
+ * panel; selecting a bottle re-tints the room, highlights it and re-sets the
+ * details in type. With two expressions there is no horizontal overflow, so
+ * the section scrolls naturally instead of pinning a track.
  */
 export function Collection({ headingLevel = 2, showCta = true }: { headingLevel?: 1 | 2; showCta?: boolean }) {
   const ref = useRef<HTMLElement>(null);
   const details = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
-  const pin = useRef<{ st: ScrollTrigger; track: HTMLElement; distance: () => number } | null>(null);
-  const lenis = useLenis();
   const { ready, reduced, mobile } = useMotion();
   const cinematic = !ready || (!reduced && !mobile);
   const exp = collection.expressions[active];
   const Heading = headingLevel === 1 ? "h1" : "h2";
 
-  useScene(ref, ({ motion, desktop }, root) => {
-    if (!(motion && desktop)) return;
+  // Arrival: the pair rises into place, then drifts gently with scroll for depth.
+  useScene(ref, ({ motion }, root) => {
+    if (!motion) return;
     const q = gsap.utils.selector(root);
-    const track = q<HTMLElement>("[data-track]")[0];
-    const distance = () => Math.max(0, track.scrollWidth - track.clientWidth);
-    const tween = gsap.to(track, {
-      x: () => -distance(),
-      ease: "none",
-      scrollTrigger: {
-        trigger: q("[data-stage]")[0],
-        start: "top top",
-        end: () => `+=${distance()}`,
-        scrub: 1,
-        pin: true,
-        anticipatePin: 1,
-        invalidateOnRefresh: true,
-      },
+    const stage = q("[data-stage]")[0];
+    gsap.from(q("[data-card-item]"), {
+      yPercent: 14,
+      autoAlpha: 0,
+      stagger: 0.14,
+      duration: 1.4,
+      ease: EASE.rise,
+      scrollTrigger: { trigger: stage, start: "top 70%", once: true },
     });
-    pin.current = { st: tween.scrollTrigger!, track, distance };
-    // Cards drift at slightly different rates for depth.
     q<HTMLElement>("[data-card-bottle]").forEach((el, i) =>
-      gsap.fromTo(el, { yPercent: 6 + (i % 2) * 4 }, { yPercent: -6, ease: "none", scrollTrigger: { trigger: q("[data-stage]")[0], start: "top top", end: () => `+=${distance()}`, scrub: true } }),
+      gsap.fromTo(el, { yPercent: 5 + i * 3 }, { yPercent: -5, ease: "none", scrollTrigger: { trigger: stage, start: "top bottom", end: "bottom top", scrub: true } }),
     );
-    return () => (pin.current = null);
   });
-
-  // Keyboard focus on a card scrolls the page to the point where the pinned track shows it.
-  const reveal = (card: HTMLElement) => {
-    const p = pin.current;
-    if (!p) return;
-    const li = card.parentElement as HTMLElement;
-    const offset = li.offsetLeft - (p.track.clientWidth - li.offsetWidth) / 2;
-    const y = p.st.start + Math.min(p.distance(), Math.max(0, offset));
-    if (Math.abs(window.scrollY - y) > 2) (lenis ? lenis.scrollTo(y, { duration: 0.9 }) : window.scrollTo({ top: y }));
-  };
 
   // Selection choreography: background tint + details re-set in type.
   useEffect(() => {
@@ -69,7 +47,7 @@ export function Collection({ headingLevel = 2, showCta = true }: { headingLevel?
     if (!root || !el) return;
     const tint = gsap.to(root, { "--accent": exp.accent, duration: reduced ? 0 : 1.4, ease: EASE.drift });
     if (reduced) return () => { tint.kill(); };
-    const split = SplitText.create(el.querySelector("[data-name]"), { type: "chars", mask: "chars" });
+    const split = SplitText.create(el.querySelector("[data-name]"), { type: "words,chars", mask: "chars" });
     const tl = gsap.timeline();
     tl.from(split.chars, { yPercent: 110, stagger: 0.03, duration: 1.1 })
       .from(el.querySelectorAll("[data-detail]"), { autoAlpha: 0, y: 18, stagger: 0.06, duration: 0.9 }, 0.15);
@@ -83,8 +61,8 @@ export function Collection({ headingLevel = 2, showCta = true }: { headingLevel?
   return (
     <section ref={ref} className={styles.section} data-mode={cinematic ? "cinematic" : "simple"} aria-labelledby="collection-title">
       <div data-stage className={styles.stage}>
-        <div className={styles.glow} aria-hidden="true" style={{ background: `radial-gradient(closest-side, ${exp.liquid}33, transparent)` }} />
-        <div ref={details} className={styles.details} aria-live="polite">
+        <div className={styles.glow} aria-hidden="true" style={{ background: `radial-gradient(closest-side, ${exp.liquid}40, transparent)` }} />
+        <div ref={details} className={styles.details}>
           <p className="eyebrow">{collection.intro}</p>
           <Heading id="collection-title" className="visually-hidden">
             {collection.heading}
@@ -106,28 +84,32 @@ export function Collection({ headingLevel = 2, showCta = true }: { headingLevel?
           {showCta && (
             <div data-detail className={styles.ctas}>
               <Button href="/whisky" variant="solid">Discover</Button>
-              <Button href="/story">Our Story</Button>
+              <Button href="/contact">Enquire</Button>
             </div>
           )}
+          <p className="visually-hidden" aria-live="polite">
+            {exp.name} selected
+          </p>
         </div>
 
-        <ul data-track className={styles.track} aria-label="Expressions">
-          {collection.expressions.map((e, i) => (
-            <li key={e.id} className={styles.cardItem}>
-              <Card expression={e} active={i === active} onSelect={() => setActive(i)} onFocus={reveal} />
-            </li>
-          ))}
-        </ul>
+        <div className={styles.pair}>
+          <ul data-track className={styles.track} aria-label="Expressions">
+            {collection.expressions.map((e, i) => (
+              <li key={e.id} data-card-item className={styles.cardItem}>
+                <Card expression={e} active={i === active} onSelect={() => setActive(i)} />
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </section>
   );
 }
 
-function Card({ expression, active, onSelect, onFocus }: { expression: Expression; active: boolean; onSelect: () => void; onFocus: (el: HTMLElement) => void }) {
+function Card({ expression, active, onSelect }: { expression: Expression; active: boolean; onSelect: () => void }) {
   const tilt = useRef<HTMLSpanElement>(null);
   const { touch, reduced } = useMotion();
 
-  // Pointer-driven tilt: a stand-in for model rotation until GLBs exist.
   const onMove = (e: React.PointerEvent) => {
     if (touch || reduced || !tilt.current) return;
     const r = e.currentTarget.getBoundingClientRect();
@@ -139,23 +121,19 @@ function Card({ expression, active, onSelect, onFocus }: { expression: Expressio
 
   return (
     <button
+
       className={styles.card}
       data-active={active}
       aria-pressed={active}
       onClick={onSelect}
-      onFocus={(e) => e.currentTarget.matches(":focus-visible") && onFocus(e.currentTarget)}
       onPointerMove={onMove}
       onPointerLeave={onLeave}
       data-cursor={active ? "Selected" : "Select"}
     >
       <span className={styles.cardStage} data-card-bottle>
-        {expression.model ? (
-          <ProductModel src={expression.model} className={styles.model} />
-        ) : (
-          <span ref={tilt} className={styles.tilt}>
-            <BottleSVG liquid={expression.liquid} className={styles.cardBottle} />
-          </span>
-        )}
+        <span ref={tilt} className={styles.tilt}>
+          <BottleSVG liquid={expression.liquid} className={styles.cardBottle} />
+        </span>
       </span>
       <span className={styles.cardMeta}>
         <span className={`display ${styles.cardName}`}>{expression.name}</span>
