@@ -11,6 +11,7 @@ npm run build && npm start
 npm run typecheck  # needs generated route types: run dev or build once first
 npm test           # starts a temporary production server; run build first
 node scripts/bake-assets.mjs   # regenerate emblem, fallbacks and label textures
+node scripts/render-scenes.mjs # re-render the Himalayan scenes (needs `npm run dev` running and Chrome)
 ```
 
 ## Pages
@@ -52,6 +53,10 @@ Both bottles are modelled from the reference photographs, not generic shapes:
 - `useTransmissionBackdrop.ts` — works around three.js clearing the refraction buffer to white on transparent canvases (otherwise clear glass reads milky).
 
 Performance: canvases mount only when near the viewport and render only while visible; DPR is capped; `useQuality` drops to lighter glass and geometry on modest devices. Without WebGL2 (or after a GPU failure) the reference photographs stand in, driven by the same 2D choreography.
+
+## Himalayan scenes
+
+The age gate and the hero use a procedural Himalayan range (`src/three/himalaya`: shared terrain and light, the gate frames, the hero’s depth layers). It is rendered **ahead of time** by `scripts/render-scenes.mjs` (through the development-only page `/dev/scenes`) into `public/media/scenes/{landscape,portrait}`, so visitors download small images instead of computing anything: the gate appears with the first paint and the gate → hero transition is plain image crossfades. Re-run the script after changing the terrain, light or layer code.
 
 ## Brand assets
 

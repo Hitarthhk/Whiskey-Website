@@ -16,17 +16,46 @@
 .scene {
   position: fixed;
   inset: 0;
-  opacity: 0;
-  transition: opacity 2.4s var(--ease-rise);
+  overflow: hidden;
   transform-origin: 50% 60%;
   pointer-events: none;
 }
-.scene[data-ready="true"] {
-  opacity: 1;
+.scene picture {
+  display: contents;
 }
-.canvas {
-  position: absolute !important;
+.scene [data-scene-img] {
+  position: absolute;
   inset: 0;
+  object-position: 50% 50%;
+}
+.dawn {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+/* Barely-there valley mist, drifting slowly across the foothills. */
+.mist {
+  position: absolute;
+  left: -15%;
+  right: -15%;
+  bottom: 4%;
+  height: 34%;
+  opacity: 0.16;
+  filter: brightness(0.38) saturate(0.6);
+  animation: mist 70s ease-in-out infinite alternate;
+}
+.mist [data-scene-img] {
+  object-fit: fill;
+}
+@keyframes mist {
+  to {
+    transform: translateX(-8%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mist {
+    animation: none;
+  }
 }
 /* Keeps the question legible over the scene without dimming the peaks. */
 .veil {

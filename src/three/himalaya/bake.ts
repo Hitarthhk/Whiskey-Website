@@ -43,11 +43,14 @@ const fragment = himalayaGLSL + /* glsl */ `
     t = max(0.4, (uBand.x - 3.0 - RO.z) / max(rd.z, 1e-3));
     // Rays that start behind a nearer crest begin underground: walk them out
     // before searching, or the layer leaves a seam just above that crest.
+    bool clear = false;
     for (int i = 0; i < 48; i++) {
       vec3 p = RO + rd * t;
-      if (p.y - terrain(p.xz, 6) > 0.0) break;
+      if (p.y - terrain(p.xz, 6) > 0.0) { clear = true; break; }
       t += 0.12 + t * 0.004;
     }
+    // Still underground: this pixel is deep behind nearer terrain — leave it to that layer.
+    if (!clear) return 0.0;
     for (int i = 0; i < 260; i++) {
       if (float(i) >= uSteps) break;
       vec3 p = RO + rd * t;
@@ -118,7 +121,6 @@ const frame = () => new Promise<void>((r) => requestAnimationFrame(() => r()));
 
 export async function bakeHimalaya(width: number, height: number, quality: "high" | "low"): Promise<HimalayaBake> {
   const ss = quality === "high" ? 1.35 : 1;
-  const tiles = quality === "high" ? 10 : 6;
   const glCanvas = document.createElement("canvas");
   const renderer = new WebGLRenderer({ canvas: glCanvas, alpha: true, premultipliedAlpha: false, preserveDrawingBuffer: true, antialias: false });
   renderer.setPixelRatio(1);
@@ -147,7 +149,8 @@ export async function bakeHimalaya(width: number, height: number, quality: "high
     renderer.setScissorTest(false);
     renderer.clear();
     renderer.setScissorTest(true);
-    const n = mode === 1 ? tiles : 1;
+    // Short GPU calls only: a long full-screen raymarch can trip the driver watchdog.
+    const n = mode === 1 ? Math.ceil((W * H) / 150_000) : 1;
     for (let i = 0; i < n; i++) {
       const y0 = Math.floor((H * i) / n), y1 = Math.floor((H * (i + 1)) / n);
       renderer.setScissor(0, y0, W, y1 - y0);
@@ -228,6 +231,5 @@ export async function bakeHimalaya(width: number, height: number, quality: "high
     material.dispose();
     mesh.geometry.dispose();
     renderer.dispose();
-    renderer.forceContextLoss();
   }
 }

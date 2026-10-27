@@ -1,16 +1,14 @@
 "use client";
 
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
-import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 import { EASE, gsap, useMotion } from "@/animation";
 import { useScrollLock } from "./useScrollLock";
 import { brand, informationPages } from "@/content/site";
 import { Emblem } from "./Emblem";
-import { WebGLBoundary } from "./WebGLBoundary";
+import { ScenePicture } from "./landscape/ScenePicture";
 import styles from "./AgeGate.module.css";
 
-const AlpineNight = dynamic(() => import("@/three/AlpineNight"), { ssr: false });
 const KEY = "gv-age-verified";
 type Status = "checking" | "pending" | "denied" | "entered";
 
@@ -39,11 +37,8 @@ export function AgeGate({ children }: { children: ReactNode }) {
   const panel = useRef<HTMLDivElement>(null);
   const root = useRef<HTMLDivElement>(null);
   const yesBtn = useRef<HTMLButtonElement>(null);
-  const { reduced, ready, webgl, mobile } = useMotion();
+  const { reduced } = useMotion();
   const confirming = useRef(false);
-  // Midnight → first light, tweened on entry and read by the scene every frame.
-  const dawn = useRef(0);
-  const [sceneReady, setSceneReady] = useState(false);
 
   useEffect(() => {
     setStatus(readVerified() ? "entered" : "pending");
@@ -102,7 +97,7 @@ export function AgeGate({ children }: { children: ReactNode }) {
     gsap
       .timeline({ onComplete: () => setStatus("entered") })
       .to(el.querySelector("[data-gate-panel]"), { autoAlpha: 0, y: -24, duration: 0.8, ease: EASE.silk })
-      .to(dawn, { current: 1, duration: 2.2, ease: EASE.drift }, 0.35)
+      .to(el.querySelector("[data-gate-dawn]"), { opacity: 1, duration: 2.2, ease: EASE.drift }, 0.35)
       .to(el.querySelector("[data-gate-scene]"), { scale: 1.06, duration: 3, ease: EASE.drift }, 0.35)
       .to(el, { autoAlpha: 0, duration: 1.1, ease: EASE.silk }, 2.1);
   };
@@ -112,12 +107,16 @@ export function AgeGate({ children }: { children: ReactNode }) {
       <div inert={locked || undefined}>{children}</div>
       {locked && (
         <div ref={root} className={styles.gate} role="dialog" aria-modal="true" aria-labelledby="gate-title">
-          <div data-gate-scene className={styles.scene} data-ready={sceneReady} aria-hidden="true">
-            {ready && webgl && status !== "checking" && (
-              <WebGLBoundary fallback={null}>
-                <AlpineNight dawn={dawn} animate={!reduced} quality={mobile ? "low" : "high"} onReady={() => setSceneReady(true)} className={styles.canvas} />
-              </WebGLBoundary>
-            )}
+          {/* Pre-rendered midnight and first light (scripts/render-scenes.mjs): in the
+              server HTML, so they load with the page; entry crossfades to dawn. */}
+          <div data-gate-scene className={styles.scene} aria-hidden="true">
+            <ScenePicture name="gate-night" priority />
+            <div data-gate-dawn className={styles.dawn}>
+              <ScenePicture name="gate-dawn" />
+            </div>
+            <div className={styles.mist}>
+              <ScenePicture name="hero-fog-2" />
+            </div>
           </div>
           <div className={styles.veil} aria-hidden="true" />
           {status !== "checking" && (
