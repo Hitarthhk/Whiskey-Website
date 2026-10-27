@@ -63,3 +63,11 @@ test("primary navigation lists the five pages", async () => {
   const html = await (await fetch(origin + "/")).text();
   for (const href of ["/story", "/craft", "/whisky", "/contact"]) assert.ok(html.includes(`href="${href}"`), href);
 });
+
+test("the contact page offers an enquiry form without claiming it sends", async () => {
+  const html = await (await fetch(origin + "/contact")).text();
+  assert.match(html, /<form/);
+  for (const name of ["name", "email", "type", "message"]) assert.match(html, new RegExp(`name="${name}"`), name);
+  assert.match(html, /not yet connected to a submission service/);
+  assert.doesNotMatch(html, /has been sent/);
+});

@@ -13,7 +13,7 @@ import styles from "./Contact.module.css";
  * closes the homepage with an invitation; the full variant hosts the
  * enquiry form on the Contact page.
  */
-export function Contact({ children }: { children?: React.ReactNode }) {
+export function Contact({ title = contact.heading, children }: { title?: string; children?: React.ReactNode }) {
   const ref = useRef<HTMLElement>(null);
   const full = Boolean(children);
 
@@ -35,7 +35,7 @@ export function Contact({ children }: { children?: React.ReactNode }) {
         <div className={styles.copy}>
           <p className="eyebrow">{contact.intro}</p>
           <SplitReveal id="contact-title" as="h2" type="words" className={`display ${styles.title}`}>
-            {contact.heading}
+            {title}
           </SplitReveal>
           <p className={styles.lede}>{contact.lede}</p>
           <dl className={styles.facts}>
