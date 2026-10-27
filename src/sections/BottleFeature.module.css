@@ -1,0 +1,124 @@
+.section {
+  position: relative;
+  background: var(--forest-900);
+}
+.stage {
+  position: relative;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  overflow: clip;
+  background: radial-gradient(90% 70% at 50% 55%, var(--forest-800), var(--forest-900) 70%);
+}
+.mist {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  background:
+    radial-gradient(70% 45% at 50% 85%, rgba(200, 204, 190, 0.5), transparent 70%),
+    linear-gradient(180deg, var(--forest-900) 0%, rgba(12, 26, 20, 0) 40%);
+}
+.halo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(70vh, 80vw);
+  aspect-ratio: 1;
+  margin: calc(min(70vh, 80vw) / -2) 0 0 calc(min(70vh, 80vw) / -2);
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(228, 200, 140, 0.32), rgba(201, 164, 92, 0.08) 55%, transparent);
+  pointer-events: none;
+}
+.object {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+}
+.canvas {
+  position: absolute;
+  inset: 0;
+}
+.flat {
+  position: absolute;
+  inset: 14% 0;
+  display: flex;
+  justify-content: center;
+}
+.svg {
+  height: 100%;
+  width: auto;
+  filter: drop-shadow(0 40px 60px rgba(0, 0, 0, 0.5));
+}
+.placeholder {
+  position: absolute;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 4;
+}
+.step {
+  position: absolute;
+  z-index: 4;
+  display: grid;
+  gap: 20px;
+  visibility: hidden;
+}
+.center {
+  z-index: 2;
+  inset: 0;
+  place-content: center;
+  justify-items: center;
+  text-align: center;
+}
+.giant {
+  font-size: clamp(64px, 12vw, 210px);
+  color: rgba(239, 233, 220, 0.9);
+  max-width: 11ch;
+}
+.right {
+  right: var(--gutter);
+  top: 50%;
+  translate: 0 -50%;
+  width: min(420px, 34vw);
+}
+.left {
+  left: var(--gutter);
+  top: 50%;
+  translate: 0 -50%;
+  width: min(420px, 34vw);
+}
+.title {
+  font-size: clamp(38px, 4.4vw, 68px);
+}
+.body {
+  color: var(--ivory-70);
+  max-width: 38ch;
+}
+
+/* ---------- Simple layout (phones, reduced motion) ---------- */
+.stack {
+  display: none;
+}
+.section[data-mode="simple"] .stage {
+  height: 90svh;
+}
+.section[data-mode="simple"] .step {
+  display: none;
+}
+.section[data-mode="simple"] .halo {
+  opacity: 1;
+}
+.section[data-mode="simple"] .mist {
+  background: linear-gradient(180deg, var(--forest-900), transparent 35%);
+}
+.section[data-mode="simple"] .stack {
+  display: grid;
+  gap: 72px;
+  padding: 40px var(--gutter) 120px;
+}
+.stackItem {
+  display: grid;
+  gap: 16px;
+  max-width: 560px;
+}

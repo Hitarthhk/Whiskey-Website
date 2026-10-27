@@ -1,0 +1,41 @@
+.panel {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: -16vh;
+  height: 132vh;
+  z-index: 940;
+  display: none;
+  pointer-events: none;
+  will-change: transform;
+}
+.ridge {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 16vh;
+  fill: var(--forest-800);
+}
+.top {
+  top: 0;
+}
+.bottom {
+  bottom: 0;
+}
+.fill {
+  position: absolute;
+  top: calc(16vh - 1px);
+  bottom: calc(16vh - 1px);
+  left: 0;
+  right: 0;
+  background: var(--forest-800);
+  display: grid;
+  place-items: center;
+}
+.mark {
+  position: relative;
+  width: 72px;
+  color: var(--gold);
+  opacity: 0;
+}
+.terrain { position: absolute; inset: 0; pointer-events: none; }

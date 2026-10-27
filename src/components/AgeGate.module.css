@@ -1,0 +1,96 @@
+.gate {
+  overflow-y: auto;
+  position: fixed;
+  inset: 0;
+  z-index: 950;
+  display: grid;
+  place-items: center;
+  padding: var(--gutter);
+  background: radial-gradient(120% 80% at 50% 110%, var(--forest-700), var(--forest-950) 60%);
+  clip-path: inset(0 0 0 0);
+}
+.legal a { text-decoration: underline; text-underline-offset: 3px; }
+.glow {
+  position: absolute;
+  left: 50%;
+  bottom: -30vh;
+  width: 120vw;
+  height: 60vh;
+  transform: translateX(-50%);
+  background: radial-gradient(closest-side, rgba(201, 164, 92, 0.22), transparent);
+  pointer-events: none;
+}
+.panel {
+  position: relative;
+  max-width: 640px;
+  text-align: center;
+  display: grid;
+  gap: 28px;
+  justify-items: center;
+}
+.mark {
+  display: grid;
+  gap: 14px;
+  justify-items: center;
+  color: var(--gold);
+}
+.mark svg {
+  width: 64px;
+}
+.word {
+  font-family: var(--font-display);
+  font-size: 15px;
+  letter-spacing: 0.5em;
+  text-transform: uppercase;
+  color: var(--ivory);
+  padding-left: 0.5em;
+}
+.title {
+  font-size: clamp(32px, 5vw, 54px);
+  line-height: 1.08;
+}
+.actions {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.btn {
+  min-width: 160px;
+  padding: 16px 30px;
+  border: 1px solid var(--gold);
+  background: var(--gold);
+  color: var(--forest-950);
+  font-size: 12px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  transition: background 0.4s var(--ease-rise), color 0.4s var(--ease-rise);
+}
+.btn:hover {
+  background: var(--gold-bright);
+}
+.ghost {
+  background: transparent;
+  color: var(--ivory);
+}
+.ghost:hover {
+  background: var(--ivory-15);
+}
+.remember {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  font-size: 13px;
+  color: var(--ivory-70);
+}
+.remember input {
+  accent-color: var(--gold);
+  width: 16px;
+  height: 16px;
+}
+.legal {
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--ivory-45);
+  max-width: 480px;
+}
