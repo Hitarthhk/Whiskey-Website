@@ -15,6 +15,17 @@
   --ivory-15: rgba(239, 233, 220, 0.15);
   --line: rgba(201, 164, 92, 0.28);
 
+  /* Cinematic Himalayas — a colour family, not fixed section fills. */
+  --alpine-midnight: #101a20;
+  --mountain-blue: #344e5e;
+  --glacier-grey: #a5b7c2;
+  --snow-ivory: #e7e7df;
+  --whisky-amber: #bf8a49;
+  --forest-shadow: #263b34;
+  --snow-ivory-70: rgba(231, 231, 223, 0.7);
+  --snow-ivory-45: rgba(231, 231, 223, 0.45);
+  --glacier-line: rgba(165, 183, 194, 0.22);
+
   --font-display: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
   --font-body: var(--font-manrope), "Helvetica Neue", Arial, sans-serif;
 

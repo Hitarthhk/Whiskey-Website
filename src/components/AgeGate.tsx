@@ -1,13 +1,16 @@
 "use client";
 
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
+import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 import { EASE, gsap, useMotion } from "@/animation";
 import { useScrollLock } from "./useScrollLock";
 import { brand, informationPages } from "@/content/site";
 import { Emblem } from "./Emblem";
+import { WebGLBoundary } from "./WebGLBoundary";
 import styles from "./AgeGate.module.css";
 
+const AlpineNight = dynamic(() => import("@/three/AlpineNight"), { ssr: false });
 const KEY = "gv-age-verified";
 type Status = "checking" | "pending" | "denied" | "entered";
 
@@ -36,8 +39,11 @@ export function AgeGate({ children }: { children: ReactNode }) {
   const panel = useRef<HTMLDivElement>(null);
   const root = useRef<HTMLDivElement>(null);
   const yesBtn = useRef<HTMLButtonElement>(null);
-  const { reduced } = useMotion();
+  const { reduced, ready, webgl, mobile } = useMotion();
   const confirming = useRef(false);
+  // Midnight → first light, tweened on entry and read by the scene every frame.
+  const dawn = useRef(0);
+  const [sceneReady, setSceneReady] = useState(false);
 
   useEffect(() => {
     setStatus(readVerified() ? "entered" : "pending");
@@ -91,10 +97,14 @@ export function AgeGate({ children }: { children: ReactNode }) {
     }
     const el = root.current;
     if (!el || reduced) return setStatus("entered");
+    // The question fades, the range brightens toward first light, then the
+    // gateway dissolves into the hero waiting beneath it.
     gsap
       .timeline({ onComplete: () => setStatus("entered") })
-      .to(el.querySelector("[data-gate-panel]"), { autoAlpha: 0, y: -30, duration: 0.8, ease: EASE.silk })
-      .to(el, { clipPath: "inset(0 0 100% 0)", duration: 1.3, ease: EASE.silk }, "-=0.3");
+      .to(el.querySelector("[data-gate-panel]"), { autoAlpha: 0, y: -24, duration: 0.8, ease: EASE.silk })
+      .to(dawn, { current: 1, duration: 2.2, ease: EASE.drift }, 0.35)
+      .to(el.querySelector("[data-gate-scene]"), { scale: 1.06, duration: 3, ease: EASE.drift }, 0.35)
+      .to(el, { autoAlpha: 0, duration: 1.1, ease: EASE.silk }, 2.1);
   };
 
   return (
@@ -102,7 +112,14 @@ export function AgeGate({ children }: { children: ReactNode }) {
       <div inert={locked || undefined}>{children}</div>
       {locked && (
         <div ref={root} className={styles.gate} role="dialog" aria-modal="true" aria-labelledby="gate-title">
-          <div className={styles.glow} aria-hidden="true" />
+          <div data-gate-scene className={styles.scene} data-ready={sceneReady} aria-hidden="true">
+            {ready && webgl && status !== "checking" && (
+              <WebGLBoundary fallback={null}>
+                <AlpineNight dawn={dawn} animate={!reduced} quality={mobile ? "low" : "high"} onReady={() => setSceneReady(true)} className={styles.canvas} />
+              </WebGLBoundary>
+            )}
+          </div>
+          <div className={styles.veil} aria-hidden="true" />
           {status !== "checking" && (
             <div ref={panel} className={styles.panel} data-gate-panel>
               <div data-gate-mark className={styles.mark}>
