@@ -25,9 +25,10 @@ export function Story({ headingLevel = 2, content = story }: { headingLevel?: 1 
 
     if (!(motion && desktop)) {
       chapters.forEach((c) =>
-        gsap.from(c.querySelectorAll("[data-chapter-item]"), {
-          autoAlpha: 0,
-          y: motion ? 40 : 0,
+        // fromTo: chapters start hidden in the cinematic layout, so from() alone would end hidden.
+        gsap.fromTo(c.querySelectorAll("[data-chapter-item]"), { autoAlpha: 0, y: motion ? 40 : 0 }, {
+          autoAlpha: 1,
+          y: 0,
           stagger: 0.12,
           duration: 1.2,
           scrollTrigger: { trigger: c, start: "top 70%", once: true },

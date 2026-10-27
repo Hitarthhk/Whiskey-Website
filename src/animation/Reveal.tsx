@@ -22,9 +22,11 @@ export function Reveal({ children, as = "div", className, style, y = 40, delay =
 
   useScene(ref, ({ reduce }, root) => {
     const items = stagger ? root.querySelectorAll("[data-reveal]") : [root];
-    gsap.from(items, {
-      autoAlpha: 0,
-      y: reduce ? 0 : y,
+    // Explicit end state: a scene can be built while its layout is still hidden
+    // (before motion preferences resolve), and a bare from() would end hidden too.
+    gsap.fromTo(items, { autoAlpha: 0, y: reduce ? 0 : y }, {
+      autoAlpha: 1,
+      y: 0,
       duration: reduce ? 0.6 : 1.3,
       ease: EASE.rise,
       delay,

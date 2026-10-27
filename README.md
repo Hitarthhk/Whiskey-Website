@@ -1,68 +1,78 @@
-# Gamber Valley — Immersive Website Concept
+# Gamber Valley — Brand Website (pitch build)
 
-Cinematic concept site for Gamber Valley Indian Single Malt Whisky.
-Next.js 16.4 (App Router) · React 19.3 · GSAP 3.13 + ScrollTrigger + SplitText · Three.js / React Three Fiber / Drei · Lenis.
+Cinematic website for Gamber Valley Indian Single Malt Whisky, crafted by Alcobrew Distilleries India Limited in the spirit of Solan, Himachal Pradesh. *Born of Altitude. Refined by Attitude.*
+
+Next.js 16.4 (App Router) · React 19.3 · GSAP 3.13 + ScrollTrigger + SplitText · Three.js r180 / React Three Fiber / Drei · Lenis.
 
 ```bash
 npm install
-npm run dev      # http://localhost:3000
+npm run dev        # http://localhost:3000
 npm run build && npm start
-npm run typecheck
-npm test          # starts a temporary production server; run build first
+npm run typecheck  # needs generated route types: run dev or build once first
+npm test           # starts a temporary production server; run build first
+node scripts/bake-assets.mjs   # regenerate emblem, fallbacks and label textures
 ```
 
-## Experience map (homepage)
+## Pages
 
-| Scene | File | Desktop | Phone / reduced motion |
+| Route | Contents |
+| --- | --- |
+| `/` | Hero → Our Origin → Bottle Collection → Individual Bottle Showcase (Private Edition I) → Contact |
+| `/story` | Our Story: four chapters (Solan, the monal, the rhododendron, the attitude) and the Philosophy section with the emblem |
+| `/craft` | Our Craft: copper, barley and oak scenes with liquid-edge wipes and hotspots |
+| `/whisky` | Our Whisky: the collection, then a dedicated 3D showcase for each expression |
+| `/contact` | Contact: company and origin, enquiry form |
+| `/collection` | Permanent redirect to `/whisky` |
+| `/terms`, `/privacy`, `/responsible-drinking` | Preview notices, readable before age confirmation |
+
+All copy and product data live in `src/content/site.ts`. Facts come from the brand; anything unconfirmed carries `verified: false` and a visible “Pending verification” tag. ABV, age statements and cask details are deliberately absent until verified.
+
+## Sections and scroll choreography
+
+| Section | File | Desktop | Phone / reduced motion |
 | --- | --- | --- | --- |
-| Age gate | `components/AgeGate.tsx` | Modal; page is `inert` until confirmed | same |
-| Hero, "Born in the Himalayas" | `sections/Hero.tsx` | Pinned camera dolly through 5 parallax ridges, fog flood, pointer parallax | Shorter un-pinned parallax / static |
-| Bottle | `sections/BottleFeature.tsx`, `three/*` | Pinned; 3D bottle rises from the fog, turns, glides left/right, ascends | SVG bottle + stacked copy |
-| Our Story | `sections/Story.tsx` | Pinned; camera trucks across the valley; 3 chapters set in type | Sticky valley, chapters scroll over it |
-| Craftsmanship | `sections/Craft.tsx` | Pinned; liquid-edge wipes between 3 scenes, camera push, hotspots | Stacked scenes, liquid reveal on enter |
-| Collection | `sections/Collection.tsx` | Pinned horizontal track; selection re-tints the room | Native swipe carousel |
-| Closing | `sections/Closing.tsx` | Ridges settle as you arrive | same |
+| Hero | `sections/Hero.tsx` | Pinned dolly through five parallax ridges | Shorter parallax / fade |
+| Origin / Story | `sections/Story.tsx` (takes `content`) | Pinned valley, chapters set in type | Sticky valley, chapters scroll over |
+| Collection | `sections/Collection.tsx` | Two cards over one shared 3D scene; selection re-tints the room and lights the bottle | Same, stacked above the details |
+| Showcase | `sections/BottleFeature.tsx` (takes `expression`) | Pinned: rise → turn → glide left with label close-up → glide right with cap close-up → ascend | Settled 3D bottle, drag to turn, stacked copy |
+| Craft | `sections/Craft.tsx` | Pinned liquid-edge wipes between three scenes | Stacked scenes |
+| Contact | `sections/Contact.tsx` | Closing landscape; compact invitation, or the form on `/contact` | Same, single column |
 
-Inner routes (`/story`, `/craft`, `/collection`) reuse the same sections behind a `PageIntro`.
+Scenes are authored with `useScene` (`src/animation`), which scopes, reverts and re-sorts pins into DOM order. Reveals that may be built while their layout is still hidden use `fromTo` with an explicit visible end state.
 
-## Animation system (`src/animation`)
+## 3D bottles (`src/three`)
 
-- `useScene(ref, (conditions, root) => …)` is the only way scenes are authored. It wraps `useGSAP` and `gsap.matchMedia`, so every scene is scoped, reverts on unmount, rebuilds on breakpoint or reduced-motion changes, and gets `{ motion, reduce, desktop, mobile, fine }`. After any scene changes, triggers are re-sorted into DOM order and refreshed, so pins never overlap.
-- `EASE.silk / rise / drift` are the only three eases used.
-- Components: `SplitReveal` (masked chars, words or lines), `Reveal`, `Parallax`, `Magnetic`, `liquidClip()`.
-- Site chrome: `Cursor` (fine pointers only, `data-cursor="Label"` opt-in), `TransitionProvider` / `TransitionLink` (ridge wipe with a brief Three.js camera push through layered ridges on capable desktops; back and forward stay native), `Nav` (hide on scroll, native modal menu with focus containment).
-- `SmoothScroll`: Lenis smooths the wheel only. Native scroll position, keyboard, find-in-page and history restoration are preserved. It is disabled on touch devices and for reduced motion.
+Both bottles are modelled from the reference photographs, not generic shapes:
 
-Development uses `.next-dev`, while production uses `.next`, so their manifests do not overwrite one another. Builds use `next/font/google` and need access to Google Fonts. `npm test` exercises all seven routes and 404 handling against a real production server. Browser interaction and GPU checks remain separate from these HTTP tests.
+- `bottles/loft.ts` — a superellipse loft: each height has its own width, depth and squareness, which builds the flat Private Edition I decanter, the square-shouldered Vault Series bottle and round necks alike. Labels are surface-hugging patches.
+- `bottles/designs.ts` — dimensions measured from the references (`scripts/measure-assets.mjs`). Hidden depths are marked as assumptions in comments.
+- `bottles/GamberBottle.tsx` — glass, gradient liquid, real-artwork labels, the gold emblem decal, Private Edition I’s gold neck band, cork and flared stopper, and The Vault Series’ rose lattice capsule. If an expression is given a `model` (GLB), it replaces the procedural bottle.
+- `Bottle.tsx` / `BottleStage.tsx` — the showcase choreography driven by scroll progress, close-ups, drag/touch rotation (`useDragRotate.ts`) and studio lighting tinted per expression.
+- `CollectionStage.tsx` — both bottles in a single WebGL context, fitted to their cards every frame.
+- `useTransmissionBackdrop.ts` — works around three.js clearing the refraction buffer to white on transparent canvases (otherwise clear glass reads milky).
 
-The `/terms`, `/privacy`, and `/responsible-drinking` pages are available before age confirmation. They describe the preview and its actual storage behavior; the brand must still supply approved operator details and launch policies. `noindex` remains enabled, and production assets and unverified claims remain explicitly marked.
+Performance: canvases mount only when near the viewport and render only while visible; DPR is capped; `useQuality` drops to lighter glass and geometry on modest devices. Without WebGL2 (or after a GPU failure) the reference photographs stand in, driven by the same 2D choreography.
 
-## Placeholders to replace
+## Brand assets
 
-Everything that is not real brand material is visibly labelled on the page.
+`public/media/brand` and `public/media/bottle` hold the supplied originals. `scripts/bake-assets.mjs` derives everything the site loads: the emblem (without its tagline line), the favicon, lightweight fallback photographs, and label textures (the Private Edition I label flattened from perspective, its neck band unrolled, the Vault label cut along its shaped edge, the capsule signature).
 
-| Placeholder | Where | Replace with |
-| --- | --- | --- |
-| Procedural mountain ridges | `components/landscape` | Masked photo plates per layer (keep `data-layer` / `data-depth`) |
-| Lathe-built 3D bottle and canvas label | `three/Bottle.tsx`, `three/profile.ts` | Final bottle GLB (Draco/Meshopt compressed, about 2 MB or less) |
-| SVG bottle | `components/BottleSVG.tsx` | Product renders (AVIF/WebP) |
-| Craft illustrations | `components/craft/CraftArt.tsx` | Set `media` per scene in `content/site.ts` (image or MP4/WebM) |
-| Expressions I–IV | `content/site.ts` → `collection` | Real names, notes and specs; add `model` for GLB rotation |
-| Mountain mark logo | `components/MountainMark.tsx` | Official logo SVG |
+## Contact form
 
-All copy lives in `src/content/site.ts`. Claims with `verified: false` show a "Pending verification" tag until the brand confirms them.
+The enquiry form validates locally. It sends nothing unless `NEXT_PUBLIC_ENQUIRY_ENDPOINT` is set at build time; then it POSTs JSON (`name`, `email`, `type`, `message`) and confirms only on a 2xx response. Until then it says plainly that enquiries are not sent or stored. Connecting an endpoint requires updating the privacy notice.
+
+## Before launch
+
+- Supply company contact details (none are shown or invented), approved terms and privacy policies, and the brand’s responsibility statement.
+- Verify the craft hotspot details (still tagged pending), and supply distillery photography for the craft scenes (`media` per scene in `site.ts`).
+- Optional: accurate GLB models to replace the procedural bottles.
+- Confirm label artwork: the Private Edition I neck band reads “CRAFTED IN HIMALCHAL, INDIA”; the emblem and neck band show “2002”, which the site copy does not use as a date.
+- Remove `robots: noindex` in `src/app/layout.tsx`.
 
 ## Alcohol-marketing compliance notes (for legal review)
 
-These are concept-stage notes, not legal advice. Confirm each one with counsel for every market the site targets.
+Concept-stage notes, not legal advice. Confirm with counsel for every market.
 
-- **Age gate:** shown on first visit; "remember me" is opt-in (otherwise session-only). Legal drinking age differs by Indian state and by country, so consider a DOB plus location gate if counsel requires it.
-- **India:** direct and surrogate liquor advertising is restricted (Cable TV Networks Rules, ASCI code, CCPA guidelines on surrogate ads), and some states prohibit alcohol. The site therefore avoids price, purchase or "buy now" CTAs, health or performance claims, and any appeal to minors. Geo-messaging or blocking for prohibition states may be required.
-- **Responsibility messaging** appears in the gate, the footer and the menu. Wording should follow the brand's chosen code (e.g. ASCI, Portman Group, DISCUS for export markets).
-- `robots: noindex` is set while the site is a concept. Remove it at launch.
-
-## Performance and accessibility
-
-- The WebGL canvas loads lazily (`next/dynamic`, `ssr:false`), renders only while on screen, caps DPR at 1.75, and uses procedural lighting with no HDR download. Low-power devices get a non-transmissive glass material.
-- Landscapes are single SVG paths per layer, animated with transforms only.
-- Reduced motion turns pins and scrubs into simple fades and turns off Lenis and the ambient drift. Hotspots, menu and gate are keyboard operable with Escape to close; a skip link and semantic headings are included; collection cards scroll the pinned track into view on keyboard focus.
+- **Age gate:** first visit; “remember me” is opt-in (otherwise session-only). Consider a date-of-birth and location gate if counsel requires it.
+- **India:** direct and surrogate liquor advertising is restricted (Cable TV Networks Rules, ASCI code, CCPA guidelines), and some states prohibit alcohol. The site avoids price, purchase or “buy now” CTAs, health or performance claims, and any appeal to minors.
+- **Responsibility messaging** appears in the gate, the footer and the menu.

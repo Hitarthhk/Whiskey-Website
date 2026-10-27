@@ -18,8 +18,10 @@ const manrope = Manrope({ subsets: ["latin"], weight: ["400", "500"], variable: 
 
 export const metadata: Metadata = {
   title: "Gamber Valley — Indian Single Malt Whisky",
-  description: "Born in the Himalayas. An immersive expedition into the valley behind Gamber Valley Indian Single Malt Whisky.",
-  robots: { index: false, follow: false }, // concept build — remove before launch
+  description: "Born of Altitude. Refined by Attitude. Gamber Valley is an Indian single malt whisky inspired by the Himalayan landscape and heritage of Solan, Himachal Pradesh.",
+  applicationName: "Gamber Valley",
+  openGraph: { siteName: "Gamber Valley", type: "website", locale: "en_IN" },
+  robots: { index: false, follow: false }, // pitch build — keep until launch
 };
 
 export const viewport: Viewport = { themeColor: "#07100c", width: "device-width", initialScale: 1 };

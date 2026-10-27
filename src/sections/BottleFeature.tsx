@@ -37,9 +37,9 @@ export function BottleFeature({ expression = expressionById("private-edition-i")
         // Phones / reduced motion: the bottle rises once as it enters, highlight sweeps on scroll.
         // (The 3D bottle settles into its own pose; this drives the photo fallback.)
         if (motion && q("[data-bottle-2d]").length) {
-          gsap.from(q("[data-bottle-2d]"), {
-            yPercent: 30,
-            autoAlpha: 0,
+          gsap.fromTo(q("[data-bottle-2d]"), { yPercent: 30, autoAlpha: 0 }, {
+            yPercent: 0,
+            autoAlpha: 1,
             duration: 1.8,
             ease: EASE.rise,
             scrollTrigger: { trigger: root, start: "top 75%", once: true },

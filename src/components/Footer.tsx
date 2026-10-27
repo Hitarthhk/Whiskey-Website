@@ -25,7 +25,9 @@ export function Footer() {
         <p>Do not share this content with anyone under the legal drinking age. Never drink and drive.</p>
       </div>
       <div className={styles.legal}>
-        <span>© {new Date().getFullYear()} {brand.name}. Concept website — all imagery, 3D assets and copy are placeholders pending brand approval.</span>
+        <span>
+          © {new Date().getFullYear()} {brand.company}. {brand.name} concept preview — 3D bottles are renderings built from reference photography, craft scenes are illustrations, and details marked pending await verification.
+        </span>
         <span className={styles.legalLinks}>
           <TransitionLink href="/terms">Terms</TransitionLink>
           <TransitionLink href="/privacy">Privacy</TransitionLink>

@@ -42,9 +42,9 @@ export function Collection({ headingLevel = 2, showCta = true }: { headingLevel?
     if (!motion) return;
     const q = gsap.utils.selector(root);
     const stage = q("[data-stage]")[0];
-    gsap.from(q("[data-card-item]"), {
-      yPercent: 14,
-      autoAlpha: 0,
+    gsap.fromTo(q("[data-card-item]"), { yPercent: 14, autoAlpha: 0 }, {
+      yPercent: 0,
+      autoAlpha: 1,
       stagger: 0.14,
       duration: 1.4,
       ease: EASE.rise,
