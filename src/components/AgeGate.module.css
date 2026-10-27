@@ -34,8 +34,8 @@
   justify-items: center;
   color: var(--gold);
 }
-.mark svg {
-  width: 64px;
+.mark img {
+  width: 84px;
 }
 .word {
   font-family: var(--font-display);

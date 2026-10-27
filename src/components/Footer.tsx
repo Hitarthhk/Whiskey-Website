@@ -1,5 +1,5 @@
 import { brand, nav } from "@/content/site";
-import { MountainMark } from "./MountainMark";
+import { Emblem } from "./Emblem";
 import { TransitionLink } from "./transition/TransitionLink";
 import styles from "./Footer.module.css";
 
@@ -8,7 +8,7 @@ export function Footer() {
     <footer className={styles.footer}>
       <div className={styles.top}>
         <div className={styles.brand}>
-          <MountainMark className={styles.mark} />
+          <Emblem className={styles.mark} />
           <p className={`display ${styles.word}`}>{brand.name}</p>
           <p className="eyebrow">{brand.category}</p>
         </div>

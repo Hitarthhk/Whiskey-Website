@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { EASE, gsap, useMotion } from "@/animation";
 import { useScrollLock } from "./useScrollLock";
 import { brand, informationPages } from "@/content/site";
-import { MountainMark } from "./MountainMark";
+import { Emblem } from "./Emblem";
 import styles from "./AgeGate.module.css";
 
 const KEY = "gv-age-verified";
@@ -106,7 +106,7 @@ export function AgeGate({ children }: { children: ReactNode }) {
           {status !== "checking" && (
             <div ref={panel} className={styles.panel} data-gate-panel>
               <div data-gate-mark className={styles.mark}>
-                <MountainMark />
+                <Emblem />
                 <span className={styles.word}>{brand.name}</span>
               </div>
 

@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { EASE, gsap, ScrollTrigger, useMotion } from "@/animation";
 import { useScrollLock } from "./useScrollLock";
 import { brand, nav } from "@/content/site";
-import { MountainMark } from "./MountainMark";
+import { Emblem } from "./Emblem";
 import { TransitionLink } from "./transition/TransitionLink";
 import styles from "./Nav.module.css";
 
@@ -85,7 +85,7 @@ export function Nav() {
     <>
       <header ref={header} className={styles.header} data-hidden="false" data-solid="false">
         <TransitionLink href="/" className={styles.logo} aria-label={`${brand.name} — home`}>
-          <MountainMark className={styles.mark} />
+          <Emblem className={styles.mark} />
           <span>{brand.name}</span>
         </TransitionLink>
         <nav className={styles.inline} aria-label="Primary">

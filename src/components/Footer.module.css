@@ -17,8 +17,7 @@
   gap: 14px;
 }
 .mark {
-  width: 48px;
-  color: var(--gold);
+  width: 64px;
 }
 .word {
   font-size: clamp(40px, 6vw, 80px);

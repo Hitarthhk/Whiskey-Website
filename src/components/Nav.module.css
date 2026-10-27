@@ -30,8 +30,7 @@
   white-space: nowrap;
 }
 .mark {
-  width: 34px;
-  color: var(--gold);
+  width: 36px;
 }
 .inline {
   display: flex;

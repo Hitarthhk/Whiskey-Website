@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { dusk } from "@/components/landscape/palettes";
 import { Closing } from "@/sections/Closing";
 import { PageIntro } from "@/sections/PageIntro";
+import { Philosophy } from "@/sections/Philosophy";
 import { Story } from "@/sections/Story";
 
 export const metadata: Metadata = { title: "Our Story — Gamber Valley" };
@@ -11,6 +12,7 @@ export default function StoryPage() {
     <>
       <PageIntro eyebrow="Our Story" title="Rooted in Solan" palette={dusk} id="story-intro" />
       <Story />
+      <Philosophy />
       <Closing />
     </>
   );

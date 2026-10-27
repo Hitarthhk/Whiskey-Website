@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { WebGLBoundary } from "../WebGLBoundary";
 import { EASE, gsap, useMotion } from "@/animation";
-import { MountainMark } from "../MountainMark";
+import { Emblem } from "../Emblem";
 import styles from "./Transition.module.css";
 
 type Ctx = { navigate: (href: string) => void };
@@ -109,7 +109,7 @@ export function TransitionProvider({ children }: { children: ReactNode }) {
             <div className={styles.terrain}><WebGLBoundary fallback={null}><TransitionTerrain progress={progress} /></WebGLBoundary></div>
           )}
           <div data-mark className={styles.mark}>
-            <MountainMark />
+            <Emblem />
           </div>
         </div>
         <svg className={`${styles.ridge} ${styles.bottom}`} viewBox="0 0 1600 160" preserveAspectRatio="none">
