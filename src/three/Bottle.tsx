@@ -1,149 +1,117 @@
 "use client";
 
-import { useFrame, useThree } from "@react-three/fiber";
-import { useEffect, useMemo, useRef, type RefObject } from "react";
-import { DoubleSide, Group, LatheGeometry, MathUtils, PointLight, Vector2 } from "three";
+import { useFrame } from "@react-three/fiber";
+import { Suspense, useRef, type RefObject } from "react";
+import { Group, MathUtils, PerspectiveCamera, PointLight } from "three";
 import { range } from "@/animation/useScene";
-import { CAP, GLASS_PROFILE, LABEL, LIQUID_PROFILE } from "./profile";
-import { createLabelTexture } from "./labelTexture";
+import type { Expression } from "@/content/site";
+import { designs } from "./bottles/designs";
+import { GamberBottle, type Quality } from "./bottles/GamberBottle";
+import { curve } from "./bottles/loft";
+import { stepDrag, type DragState } from "./useDragRotate";
 
-export type Quality = "high" | "low";
-
-const lathe = (profile: [number, number][], segments: number) =>
-  new LatheGeometry(profile.map(([r, y]) => new Vector2(r, y)), segments);
+export type { Quality };
+export const CAMERA = { z: 7.4, fov: 30 };
 
 const ease = (t: number) => 1 - Math.pow(1 - t, 3);
 const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+/** 0 → 1 → 0 across [a, b, c, d]. */
+const bump = (p: number, a: number, b: number, c: number, d: number) => easeInOut(range(p, a, b)) * (1 - easeInOut(range(p, c, d)));
+
+// Rotation keyframes across the scroll: a full turn while rising, the label
+// held to camera for its close-up, a quarter turn for the cap, then a turn out.
+const TAU = Math.PI * 2;
+const spin = curve([[0, -1.3], [0.28, TAU - 0.35], [0.36, TAU - 0.1], [0.52, TAU + 0.06], [0.6, TAU + 0.5], [0.76, TAU + 0.75], [1, 2 * TAU + 0.6]]);
+
+/** Fits a bottle into the frame (visible size at the default camera distance). */
+export function fitScale(id: Expression["id"], visW: number, visH: number, heightShare = 0.66, widthShare = 0.7) {
+  const d = designs[id];
+  return Math.min(d.display, (visH * heightShare) / d.height, (visW * widthShare) / d.width);
+}
+
+type Props = {
+  expression: Expression;
+  progress: RefObject<number>;
+  quality: Quality;
+  /** "scroll": the showcase choreography. "static": a settled, turnable pose. */
+  mode: "scroll" | "static";
+  /** Gentle idle turn in the static pose (off for reduced motion). */
+  idle: boolean;
+  drag: RefObject<DragState>;
+};
 
 /**
- * Conceptual whisky bottle, choreographed entirely by `progress` (0→1),
- * which the owning section writes from its ScrollTrigger.
+ * A Gamber Valley bottle choreographed by `progress` (0→1), which the owning
+ * section writes from its ScrollTrigger: rise out of the fog → turn → glide
+ * left (label close-up) → glide right (cap close-up) → ascend out.
  */
-export function Bottle({ progress, quality, liquid = "#9c5512" }: { progress: RefObject<number>; quality: Quality; liquid?: string }) {
-  const group = useRef<Group>(null);
+export function Bottle({ expression, progress, quality, mode, idle, drag }: Props) {
+  const outer = useRef<Group>(null);
   const sweep = useRef<PointLight>(null);
-  const pointer = useThree((s) => s.pointer);
-  const viewport = useThree((s) => s.viewport);
-  const segments = quality === "high" ? 96 : 48;
+  const design = designs[expression.id];
 
-  const glass = useMemo(() => lathe(GLASS_PROFILE, segments), [segments]);
-  const fluid = useMemo(() => lathe(LIQUID_PROFILE, segments), [segments]);
-  const label = useMemo(() => createLabelTexture(liquid), [liquid]);
-
-  useEffect(
-    () => () => {
-      glass.dispose();
-      fluid.dispose();
-      label.dispose();
-    },
-    [glass, fluid, label],
-  );
-
-  useFrame((_, dt) => {
-    const g = group.current;
+  useFrame((state, dt) => {
+    const g = outer.current;
     if (!g) return;
-    const p = progress.current ?? 0;
-    const wide = viewport.aspect > 1;
-    const side = wide ? viewport.width * 0.2 : 0;
+    const camera = state.camera as PerspectiveCamera;
+    const aspect = state.size.width / Math.max(1, state.size.height);
+    const visH = 2 * CAMERA.z * Math.tan(MathUtils.degToRad(CAMERA.fov / 2));
+    const visW = visH * aspect;
+    const scale = fitScale(expression.id, visW, visH, mode === "scroll" ? 0.7 : 0.78, aspect > 1 ? 0.42 : 0.8);
+    const user = stepDrag(drag.current, dt);
+    const pointer = state.pointer;
 
-    // 1 · rise out of the fog   2 · glide left   3 · glide right   4 · ascend out
-    const rise = ease(range(p, 0, 0.28));
-    const left = easeInOut(range(p, 0.32, 0.5));
-    const right = easeInOut(range(p, 0.58, 0.76));
-    const exit = easeInOut(range(p, 0.84, 1));
+    let x = 0, y = 0, rotY: number, s = scale, camZ = CAMERA.z, camY = 0;
+    if (mode === "scroll") {
+      const p = progress.current ?? 0;
+      const side = aspect > 1 ? visW * 0.2 : 0;
+      // 1 · rise out of the fog   2 · glide left   3 · glide right   4 · ascend out
+      const rise = ease(range(p, 0, 0.28));
+      const left = easeInOut(range(p, 0.32, 0.5));
+      const right = easeInOut(range(p, 0.58, 0.76));
+      const exit = easeInOut(range(p, 0.84, 1));
+      x = -side * left + 2 * side * right - side * exit;
+      y = MathUtils.lerp(-visH * 0.86, 0, rise) + exit * visH * 0.9 + pointer.y * 0.05;
+      rotY = spin(p) + pointer.x * 0.25;
+      s = scale * MathUtils.lerp(0.86, 1, rise) * (1 - exit * 0.15);
+      // Close-ups: dolly toward the label, then up to the neck and cap.
+      const label = bump(p, 0.33, 0.4, 0.5, 0.57);
+      const cap = bump(p, 0.59, 0.66, 0.74, 0.8);
+      camZ = CAMERA.z - label * 2.1 - cap * 2.6;
+      camY = (design.focus.label - design.height / 2) * s * label + (design.focus.cap - design.height / 2) * s * cap;
+      x *= camZ / CAMERA.z + (1 - camZ / CAMERA.z) * 0.35; // keep the bottle clear of the copy while closer
+    } else {
+      const since = (performance.now() - drag.current.lastInteraction) / 1000;
+      const resume = Math.min(1, Math.max(0, since - 1.5));
+      rotY = -0.35 + (idle ? state.clock.elapsedTime * 0.35 * resume : 0);
+    }
 
-    const targetX = -side * left + 2 * side * right - side * exit;
-    const targetY = MathUtils.lerp(-3.4, -0.05, rise) + exit * 3.6 + pointer.y * 0.05;
-    const targetRotY = -0.5 + p * Math.PI * 2.4 + pointer.x * 0.3;
-    const targetScale = MathUtils.lerp(0.86, 1, rise) * (1 - exit * 0.15);
-
-    g.position.x = MathUtils.damp(g.position.x, targetX, 4, dt);
-    g.position.y = MathUtils.damp(g.position.y, targetY, 4, dt);
-    g.rotation.y = MathUtils.damp(g.rotation.y, targetRotY, 3.5, dt);
-    // Lean into lateral movement like a camera-tracked object.
-    g.rotation.z = MathUtils.damp(g.rotation.z, (targetX - g.position.x) * -0.18, 3, dt);
-    g.rotation.x = MathUtils.damp(g.rotation.x, pointer.y * -0.06, 3, dt);
-    g.scale.setScalar(MathUtils.damp(g.scale.x, targetScale, 4, dt));
+    g.position.x = MathUtils.damp(g.position.x, x, 4, dt);
+    g.position.y = MathUtils.damp(g.position.y, y, 4, dt);
+    g.rotation.y = MathUtils.damp(g.rotation.y, rotY + user, drag.current.dragging ? 14 : 3.5, dt);
+    g.rotation.z = MathUtils.damp(g.rotation.z, (x - g.position.x) * -0.12, 3, dt);
+    g.rotation.x = MathUtils.damp(g.rotation.x, pointer.y * -0.05, 3, dt);
+    g.scale.setScalar(MathUtils.damp(g.scale.x, s, 4, dt));
+    camera.position.z = MathUtils.damp(camera.position.z, camZ, 3.2, dt);
+    camera.position.y = MathUtils.damp(camera.position.y, camY, 3.2, dt);
 
     // A warm highlight travels across the glass as the bottle turns.
     if (sweep.current) {
+      const p = mode === "scroll" ? progress.current ?? 0 : (state.clock.elapsedTime * 0.08) % 1;
       sweep.current.position.x = Math.sin(p * Math.PI * 3) * 2.6 + g.position.x;
+      sweep.current.position.y = g.position.y + 0.6;
       sweep.current.intensity = 6 + Math.sin(p * Math.PI * 6) * 3;
     }
   });
 
-  const arcStart = -LABEL.arc / 2;
   return (
     <>
-      <pointLight ref={sweep} position={[0, 0.6, 2.4]} color="#ffd9a0" intensity={6} distance={7} decay={1.6} />
-      <group ref={group} position={[0, -3.4, 0]}>
-        <group position={[0, -1.35, 0]}>
-          {/* Glass */}
-          <mesh geometry={glass} renderOrder={2}>
-            {quality === "high" ? (
-              <meshPhysicalMaterial
-                transmission={1}
-                thickness={0.35}
-                roughness={0.04}
-                ior={1.5}
-                color="#e8f0e6"
-                attenuationColor="#d9e6d5"
-                attenuationDistance={2.5}
-                clearcoat={1}
-                clearcoatRoughness={0.05}
-                specularIntensity={1}
-                envMapIntensity={1.4}
-                side={DoubleSide}
-              />
-            ) : (
-              <meshPhysicalMaterial
-                transparent
-                opacity={0.28}
-                roughness={0.05}
-                metalness={0.1}
-                clearcoat={1}
-                envMapIntensity={1.6}
-                color="#dfe8dc"
-                depthWrite={false}
-              />
-            )}
-          </mesh>
-
-          {/* Whisky */}
-          <mesh geometry={fluid} renderOrder={1}>
-            <meshPhysicalMaterial
-              color={liquid}
-              emissive={liquid}
-              emissiveIntensity={0.07}
-              roughness={0.12}
-              clearcoat={1}
-              sheen={0.6}
-              sheenColor="#ffcc80"
-              envMapIntensity={1.2}
-            />
-          </mesh>
-
-          {/* Label — conceptual artwork */}
-          <mesh position={[0, (LABEL.bottom + LABEL.top) / 2, 0]} renderOrder={3}>
-            <cylinderGeometry args={[LABEL.radius, LABEL.radius, LABEL.top - LABEL.bottom, 64, 1, true, arcStart, LABEL.arc]} />
-            <meshStandardMaterial map={label} roughness={0.75} metalness={0} side={DoubleSide} />
-          </mesh>
-
-          {/* Neck band */}
-          <mesh position={[0, 2.22, 0]}>
-            <cylinderGeometry args={[0.162, 0.162, 0.1, 48, 1, true]} />
-            <meshStandardMaterial color="#c9a45c" metalness={1} roughness={0.28} />
-          </mesh>
-
-          {/* Stopper */}
-          <mesh position={[0, CAP.base + CAP.height / 2, 0]}>
-            <cylinderGeometry args={[CAP.radius, CAP.radius * 1.04, CAP.height, 48]} />
-            <meshStandardMaterial color="#b8924d" metalness={1} roughness={0.32} />
-          </mesh>
-          <mesh position={[0, CAP.base + CAP.height + 0.012, 0]}>
-            <cylinderGeometry args={[CAP.radius * 0.92, CAP.radius, 0.025, 48]} />
-            <meshStandardMaterial color="#e4c88c" metalness={1} roughness={0.2} />
-          </mesh>
+      <pointLight ref={sweep} position={[0, 0.6, 2.4]} color={design.light.key} intensity={6} distance={7} decay={1.6} />
+      <group ref={outer} position={[0, -6, 0]}>
+        <group position={[0, -design.height / 2, 0]}>
+          <Suspense fallback={null}>
+            <GamberBottle expression={expression} quality={quality} />
+          </Suspense>
         </group>
       </group>
     </>

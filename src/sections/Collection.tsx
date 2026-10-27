@@ -1,24 +1,39 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
+import { useEffect, useRef, useState, type RefObject } from "react";
 import { EASE, gsap, SplitText, useMotion, useScene } from "@/animation";
-import { BottleSVG } from "@/components/BottleSVG";
 import { Button } from "@/components/Button";
-import { collection, type Expression } from "@/content/site";
+import { ProductImage } from "@/components/ProductImage";
+import { WebGLBoundary } from "@/components/WebGLBoundary";
+import { collection, type Expression, type ExpressionId } from "@/content/site";
+import { useDragRotate, type DragState } from "@/three/useDragRotate";
+import { useQuality } from "@/three/useQuality";
 import styles from "./Collection.module.css";
 
+const CollectionStage = dynamic(() => import("@/three/CollectionStage"), { ssr: false });
+type Slots = RefObject<Partial<Record<ExpressionId, HTMLElement | null>>>;
+type Drags = RefObject<Partial<Record<ExpressionId, DragState>>>;
+
 /**
- * Two-bottle presentation. The pair stands side by side next to a details
- * panel; selecting a bottle re-tints the room, highlights it and re-sets the
- * details in type. With two expressions there is no horizontal overflow, so
- * the section scrolls naturally instead of pinning a track.
+ * Two-bottle presentation. The pair of 3D bottles stands behind their cards
+ * next to a details panel; selecting one re-tints the room, brings it forward
+ * into the light and re-sets the details in type. Drag a card to turn its
+ * bottle. With two expressions there is no horizontal overflow, so the
+ * section scrolls naturally instead of pinning a track. Without WebGL the
+ * reference photographs stand in the cards.
  */
 export function Collection({ headingLevel = 2, showCta = true }: { headingLevel?: 1 | 2; showCta?: boolean }) {
   const ref = useRef<HTMLElement>(null);
   const details = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
-  const { ready, reduced, mobile } = useMotion();
+  const { ready, reduced, mobile, webgl } = useMotion();
   const cinematic = !ready || (!reduced && !mobile);
+  const [gpuFailed, setGpuFailed] = useState(false);
+  const use3D = ready && webgl && !gpuFailed;
+  const quality = useQuality();
+  const slots: Slots = useRef({});
+  const drags: Drags = useRef({});
   const exp = collection.expressions[active];
   const Heading = headingLevel === 1 ? "h1" : "h2";
 
@@ -93,10 +108,15 @@ export function Collection({ headingLevel = 2, showCta = true }: { headingLevel?
         </div>
 
         <div className={styles.pair}>
+          {use3D && (
+            <WebGLBoundary onError={() => setGpuFailed(true)} fallback={null}>
+              <CollectionStage expressions={collection.expressions} active={active} slots={slots} drags={drags} quality={quality} idle={!reduced} className={styles.models} />
+            </WebGLBoundary>
+          )}
           <ul data-track className={styles.track} aria-label="Expressions">
             {collection.expressions.map((e, i) => (
               <li key={e.id} data-card-item className={styles.cardItem}>
-                <Card expression={e} active={i === active} onSelect={() => setActive(i)} />
+                <Card expression={e} active={i === active} onSelect={() => setActive(i)} use3D={use3D} slots={slots} drags={drags} />
               </li>
             ))}
           </ul>
@@ -106,12 +126,21 @@ export function Collection({ headingLevel = 2, showCta = true }: { headingLevel?
   );
 }
 
-function Card({ expression, active, onSelect }: { expression: Expression; active: boolean; onSelect: () => void }) {
+function Card({ expression, active, onSelect, use3D, slots, drags }: { expression: Expression; active: boolean; onSelect: () => void; use3D: boolean; slots: Slots; drags: Drags }) {
+  const button = useRef<HTMLButtonElement>(null);
   const tilt = useRef<HTMLSpanElement>(null);
   const { touch, reduced } = useMotion();
+  const drag = useDragRotate(button, use3D);
 
+  useEffect(() => {
+    const d = drags.current;
+    d[expression.id] = drag.current;
+    return () => { delete d[expression.id]; };
+  }, [drag, drags, expression.id]);
+
+  // Photo fallback only: pointer-driven tilt and sheen.
   const onMove = (e: React.PointerEvent) => {
-    if (touch || reduced || !tilt.current) return;
+    if (use3D || touch || reduced || !tilt.current) return;
     const r = e.currentTarget.getBoundingClientRect();
     const nx = (e.clientX - r.left) / r.width - 0.5;
     gsap.to(tilt.current, { rotateY: nx * 28, rotateX: 4, duration: 0.8, ease: "power3" });
@@ -121,19 +150,21 @@ function Card({ expression, active, onSelect }: { expression: Expression; active
 
   return (
     <button
-
+      ref={button}
       className={styles.card}
       data-active={active}
       aria-pressed={active}
-      onClick={onSelect}
+      onClick={() => !drag.current.moved && onSelect()}
       onPointerMove={onMove}
       onPointerLeave={onLeave}
-      data-cursor={active ? "Selected" : "Select"}
+      data-cursor={use3D ? "Drag" : active ? "Selected" : "Select"}
     >
-      <span className={styles.cardStage} data-card-bottle>
-        <span ref={tilt} className={styles.tilt}>
-          <BottleSVG liquid={expression.liquid} className={styles.cardBottle} />
-        </span>
+      <span className={styles.cardStage} data-card-bottle ref={(el) => { slots.current[expression.id] = el; }}>
+        {!use3D && (
+          <span ref={tilt} className={styles.tilt}>
+            <ProductImage expression={expression} className={styles.cardBottle} />
+          </span>
+        )}
       </span>
       <span className={styles.cardMeta}>
         <span className={`display ${styles.cardName}`}>{expression.name}</span>

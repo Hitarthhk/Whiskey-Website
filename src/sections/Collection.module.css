@@ -81,6 +81,7 @@
 /* Optional WebGL layer sits behind the cards and is aligned to them. */
 .models {
   position: absolute;
+  inset: 0;
   z-index: 1;
   pointer-events: none;
 }

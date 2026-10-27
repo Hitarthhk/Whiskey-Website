@@ -1,21 +1,23 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { EASE, gsap, Reveal, SplitText, useMotion, useScene } from "@/animation";
-import { BottleSVG } from "@/components/BottleSVG";
+import { ProductImage } from "@/components/ProductImage";
 import { WebGLBoundary } from "@/components/WebGLBoundary";
 import { ClaimText, PendingTag } from "@/components/Pending";
 import { expressionById, type Expression } from "@/content/site";
+import { useQuality } from "@/three/useQuality";
 import styles from "./BottleFeature.module.css";
 
 const BottleStage = dynamic(() => import("@/three/BottleStage"), { ssr: false });
 
 /**
- * The bottle rises out of the hero's fog and is choreographed by scroll:
- * rise → turn → glide left → glide right → ascend into the story.
- * Desktop with WebGL gets the 3D bottle; everything else gets the SVG bottle
- * driven by the same timeline, or a calm stacked layout on phones.
+ * Individual bottle showcase. The 3D bottle rises out of the mist and is
+ * choreographed by scroll: rise → turn → glide left (label close-up) → glide
+ * right (cap close-up) → ascend out. Phones and reduced motion get a settled,
+ * drag-to-turn 3D bottle beside stacked copy. Without WebGL the reference
+ * photograph takes the same 2D choreography.
  */
 export function BottleFeature({ expression = expressionById("private-edition-i") }: { expression?: Expression }) {
   const ref = useRef<HTMLElement>(null);
@@ -23,13 +25,9 @@ export function BottleFeature({ expression = expressionById("private-edition-i")
   const { ready, reduced, mobile, webgl } = useMotion();
   const [gpuFailed, setGpuFailed] = useState(false);
   const cinematic = !ready || (!reduced && !mobile);
-  const use3D = ready && cinematic && webgl && !gpuFailed;
-  const [quality, setQuality] = useState<"high" | "low">("high");
-
-  useEffect(() => {
-    const cores = navigator.hardwareConcurrency ?? 8;
-    setQuality(cores <= 4 || window.devicePixelRatio > 2.5 ? "low" : "high");
-  }, []);
+  const use3D = ready && webgl && !gpuFailed;
+  const mode = ready && !reduced && !mobile ? "scroll" : "static";
+  const quality = useQuality();
 
   useScene(
     ref,
@@ -37,7 +35,8 @@ export function BottleFeature({ expression = expressionById("private-edition-i")
       const q = gsap.utils.selector(root);
       if (!(motion && desktop)) {
         // Phones / reduced motion: the bottle rises once as it enters, highlight sweeps on scroll.
-        if (motion) {
+        // (The 3D bottle settles into its own pose; this drives the photo fallback.)
+        if (motion && q("[data-bottle-2d]").length) {
           gsap.from(q("[data-bottle-2d]"), {
             yPercent: 30,
             autoAlpha: 0,
@@ -90,9 +89,9 @@ export function BottleFeature({ expression = expressionById("private-edition-i")
       const flat = q("[data-bottle-2d]");
       if (flat.length) {
         tl.fromTo(flat, { yPercent: 70, autoAlpha: 0 }, { yPercent: 0, autoAlpha: 1, duration: 0.28 }, 0)
-          .to(flat, { xPercent: -70, duration: 0.18 }, 0.32)
-          .to(flat, { xPercent: 70, duration: 0.18 }, 0.58)
-          .to(flat, { xPercent: 0, yPercent: -120, autoAlpha: 0, duration: 0.16 }, 0.84)
+          .to(flat, { x: () => -innerWidth * 0.22, duration: 0.18 }, 0.32) // glide by viewport, not bottle width
+          .to(flat, { x: () => innerWidth * 0.22, duration: 0.18 }, 0.58)
+          .to(flat, { x: 0, yPercent: -120, autoAlpha: 0, duration: 0.16 }, 0.84)
           .fromTo(q("[data-highlight]"), { x: 0 }, { x: 120, duration: 1 }, 0);
       }
 
@@ -116,16 +115,16 @@ export function BottleFeature({ expression = expressionById("private-edition-i")
 
         <div className={styles.object}>
           {use3D ? (
-            <WebGLBoundary onError={() => setGpuFailed(true)} fallback={<div className={styles.flat}><BottleSVG className={styles.svg} /></div>}>
-              <BottleStage progress={progress} quality={quality} className={styles.canvas} />
+            <WebGLBoundary onError={() => setGpuFailed(true)} fallback={<div className={styles.flat}><ProductImage expression={expression} className={styles.svg} /></div>}>
+              <BottleStage expression={expression} progress={progress} quality={quality} mode={mode} idle={!reduced} className={styles.canvas} />
             </WebGLBoundary>
           ) : (
             <div data-bottle-2d className={styles.flat}>
-              <BottleSVG className={styles.svg} />
+              <ProductImage expression={expression} className={styles.svg} />
             </div>
           )}
           <span className={styles.placeholder}>
-            <PendingTag>3D placeholder — awaiting product model</PendingTag>
+            <PendingTag>{use3D ? "3D rendering from reference photography · drag to turn" : "Reference photography"}</PendingTag>
           </span>
         </div>
 

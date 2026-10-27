@@ -20,7 +20,7 @@ export const brand = {
   originShort: "Solan, Himachal Pradesh",
   philosophy: ["Patience", "Craftsmanship", "Authenticity"],
   identity: "Himalayan monal and rhododendron",
-  emblem: { src: "/media/brand/gamber-valley-emblem.png", width: 1024, height: 680 },
+  emblem: { src: "/media/brand/gamber-valley-emblem.webp", width: 512, height: 640 },
   responsibility: "Enjoy responsibly. For adults of legal drinking age only.",
 };
 
@@ -168,7 +168,7 @@ export const expressions: Expression[] = [
     liquid: "#b5621a",
     accent: "#0f3326",
     theme: { name: "Deep emerald, antique gold and amber", colors: ["#0f3326", "#b08a43", "#b5621a"] },
-    image: { src: "/media/bottles/private-edition-i.webp", alt: "Gamber Valley Private Edition I decanter", width: 900, height: 839 },
+    image: { src: "/media/bottles/private-edition-i.webp", alt: "Gamber Valley Private Edition I decanter", width: 900, height: 1037 },
     notes: {
       nose: "Demerara sugar, dates, honey, vanilla, eucalyptus and lavender.",
       palate: "Rich malt, dried ginger and gentle spice.",
@@ -187,7 +187,7 @@ export const expressions: Expression[] = [
     liquid: "#7a1f2b",
     accent: "#331219",
     theme: { name: "Deep burgundy, muted rose, warm amber and gold", colors: ["#4a1420", "#c99299", "#c27a2c", "#c9a45c"] },
-    image: { src: "/media/bottles/the-vault-series.webp", alt: "Gamber Valley The Vault Series bottle", width: 520, height: 1900 },
+    image: { src: "/media/bottles/the-vault-series.webp", alt: "Gamber Valley The Vault Series bottle", width: 329, height: 1200 },
     notes: {
       nose: "Delicate malt and soft vanilla.",
       palate: "Honey, chocolate and subtle spice.",
