@@ -144,6 +144,7 @@ function TwilightContact({ title }: { title: string }) {
       ref={ref}
       className={`${styles.section} ${styles.twilight}`}
       data-scene="twilight"
+      data-soundscape="breeze"
       data-mode={cinematic ? "cinematic" : "simple"}
       style={{ "--closing": `${ORIGIN_SCROLL.closing}vh` } as React.CSSProperties}
       aria-labelledby="contact-title"

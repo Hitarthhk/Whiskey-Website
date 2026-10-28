@@ -311,3 +311,14 @@ export const nav = [
 
 /** Pages readable before age confirmation. */
 export const informationPages = ["/terms", "/privacy", "/responsible-drinking"];
+
+/** "The Sound of the Valley": licensed field recordings (Wikimedia Commons),
+ * each labelled by where it was actually recorded. None is from Solan; see
+ * docs/assets/soundscape.md for the recordings still to be made there. */
+export const soundCredits = [
+  { subject: "Dawn soundscape, Pathari Forest Range, Uttarakhand", author: "Taukeer Alam Lodha", license: "CC BY-SA 4.0", licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0", source: "https://commons.wikimedia.org/wiki/File:Sonus_naturalis_-_Soundscape_XC376330.mp3" },
+  { subject: "Streaked laughingthrush, Shimla, Himachal Pradesh", author: "Shyamal", license: "CC BY 4.0", licenseUrl: "https://creativecommons.org/licenses/by/4.0", source: "https://commons.wikimedia.org/wiki/File:Streaked_laughing_thrush_simla.ogg" },
+  { subject: "Great barbet, Munsiyari, Uttarakhand", author: "L. Shyamal", license: "CC BY-SA 3.0", licenseUrl: "https://creativecommons.org/licenses/by-sa/3.0", source: "https://commons.wikimedia.org/wiki/File:MegalaimaVirens.ogg" },
+  { subject: "Wind in woodland, Bourne Woods, England", author: "Robert EA Harvey", license: "CC BY-SA 4.0", licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0", source: "https://commons.wikimedia.org/wiki/File:Bourne_woods_windy_2020-05-05_0757.mp3" },
+  { subject: "Wind in a pine forest, Lysekil, Sweden", author: "W.carter", license: "CC BY-SA 4.0", licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0", source: "https://commons.wikimedia.org/wiki/File:Wind_in_Swedish_pine_forest_at_25_mps.ogg" },
+];

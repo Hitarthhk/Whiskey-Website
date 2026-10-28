@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { useCallback, useRef, useState, type ReactNode } from "react";
 import { preload } from "react-dom";
 import { EASE, gsap, Reveal, SplitText, useMotion, useScene } from "@/animation";
+import { useMotionThreshold } from "@/animation/useMotionThreshold";
 import { ProductImage } from "@/components/ProductImage";
 import { WebGLBoundary } from "@/components/WebGLBoundary";
 import { ClaimText, PendingTag } from "@/components/Pending";
@@ -32,6 +33,8 @@ export function BottleFeature({ expression = expressionById("private-edition-i")
   const gallery = children ? handoff?.gallery : undefined;
   const localProgress = useMotionValue(0);
   const sceneProgress = handoff?.progress ?? localProgress;
+  // Sharing the hero's stage, the showcase sets the mood once the bottle starts to rise.
+  const rising = useMotionThreshold(sceneProgress, 0.06);
   const valleyOpacity = useTransform(sceneProgress, GALLERY.environment.input, [1, 0.65, 0]);
   const pointer = useTransform(sceneProgress, value => value >= 0.91 ? "none" : "auto");
   const noteOpacity = useTransform(sceneProgress, gallery ? [...BOTTLE_NOTE.input, 0.86, 0.93] : BOTTLE_NOTE.input, gallery ? [...BOTTLE_NOTE.output, 1, 0] : BOTTLE_NOTE.output);
@@ -178,6 +181,7 @@ export function BottleFeature({ expression = expressionById("private-edition-i")
       data-mode={cinematic ? "cinematic" : "simple"}
       data-handoff={!!handoff}
       data-gallery-linked={!!gallery}
+      data-soundscape={!handoff || rising ? "showcase" : undefined}
       aria-label={expression.name}
       style={{ "--stage-from": expression.stage[0], "--stage-to": expression.stage[1] } as React.CSSProperties}
     >

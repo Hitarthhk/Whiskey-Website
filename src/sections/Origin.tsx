@@ -116,6 +116,8 @@ export function Origin() {
       data-origin
       data-mode={cinematic ? "cinematic" : "simple"}
       data-veiled={veiled}
+      // Over the collection it takes the mood only once its valley covers it.
+      data-soundscape={cinematic && !veiled ? undefined : "forest"}
       data-released={released}
       style={{ "--origin-bridge": `${ORIGIN_SCROLL.bridge}vh` } as React.CSSProperties}
       aria-labelledby="origin-title"

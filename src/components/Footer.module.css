@@ -62,3 +62,8 @@
 .legalLinks a:hover {
   color: var(--ivory);
 }
+.credits { font-size: 11px; line-height: 1.6; color: var(--ivory-45); margin-top: -40px; }
+.credits summary { cursor: pointer; width: max-content; letter-spacing: 0.18em; text-transform: uppercase; }
+.credits summary:hover { color: var(--ivory); }
+.credits ul { margin: 10px 0 0; padding: 0; list-style: none; display: grid; gap: 4px; }
+.credits a { text-decoration: underline; text-underline-offset: 2px; }

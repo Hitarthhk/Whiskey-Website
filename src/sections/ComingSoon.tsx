@@ -19,7 +19,7 @@ export function ComingSoon({ page }: { page: string }) {
   });
 
   return (
-    <section className={styles.section} aria-labelledby="coming-soon-title">
+    <section className={styles.section} data-soundscape="breeze" aria-labelledby="coming-soon-title">
       <div className={styles.backdrop} aria-hidden="true">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/media/story/closing-twilight.webp" alt="" decoding="async" fetchPriority="high" />

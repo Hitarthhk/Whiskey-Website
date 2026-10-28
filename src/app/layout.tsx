@@ -4,6 +4,7 @@ import { MotionProvider, MotionUIProvider, SmoothScroll } from "@/animation";
 import { AgeGate } from "@/components/AgeGate";
 import { Footer } from "@/components/Footer";
 import { Nav } from "@/components/Nav";
+import { SoundToggle } from "@/components/sound/SoundToggle";
 import { TransitionProvider } from "@/components/transition/TransitionProvider";
 import "./globals.css";
 
@@ -41,6 +42,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   <Nav />
                   <main id="main" tabIndex={-1}>{children}</main>
                   <Footer />
+                  <SoundToggle />
                 </AgeGate>
                 <div className="grain" aria-hidden="true" />
               </TransitionProvider>

@@ -53,6 +53,10 @@ Contact's twilight plate is currently an **interim** (the age-gate photograph, m
 
 Internal links (`TransitionLink`) play **the pour** (`components/transition/TransitionProvider.tsx`, shader in `three/pour.ts`). Whisky-amber liquid spreads from the point that was clicked, with a lit meniscus at its edge. The emblem and the destination's name surface in it while the route changes, then the level drains away to reveal the new page. One WebGL canvas is created during idle time and reused, and it renders only while a transition runs, on its own capped clock so a heavy first render never makes it jump. Without WebGL the same shapes are drawn in CSS; reduced motion gets a short amber fade. Back/forward, new-tab, hash and external links stay native, and an 8-second watchdog recovers an abandoned navigation.
 
+## The Sound of the Valley
+
+An ambient soundscape (`components/sound/`), muted by default, with a small toggle in the bottom-right corner. Licensed field recordings (wind, pines, Himalayan foothill birds) and two quiet synthesized layers crossfade as the visitor scrolls: each section declares its mood with `data-soundscape` (`hero`, `showcase`, `collection`, `forest`, `breeze`). It starts only from an explicit interaction, remembers the preference, continues across pages and pauses in hidden tabs. The current recordings are labelled stand-ins, none from Solan; the asset manifest, credits and the recordings to commission are in `docs/assets/soundscape.md`.
+
 ## 3D bottles (`src/three`)
 
 Both bottles are modelled from the reference photographs, not generic shapes:

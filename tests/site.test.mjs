@@ -103,6 +103,19 @@ test("Our Story keeps its five chapters, quotations, emblem parts and principles
   assert.ok(story.includes(`href="/media/brand/gamber-valley-emblem.webp"`) || story.includes(`src="/media/brand/gamber-valley-emblem.webp"`), "Original emblem missing");
 });
 
+test("the soundscape control is present, muted by default, and credits its recordings", async () => {
+  const home = (await (await fetch(origin + "/")).text()).replace(/<!-- -->/g, "");
+  assert.match(home, /aria-pressed="false"[^>]*data-on="false"/, "sound must start muted");
+  assert.match(home, /Turn the sound of the valley on/);
+  for (const scene of ["hero", "breeze"]) assert.match(home, new RegExp(`data-soundscape="${scene}"`), scene);
+  assert.match(home, /Sound credits/);
+  for (const author of ["Taukeer Alam Lodha", "Shyamal", "Robert EA Harvey", "W.carter"]) assert.ok(home.includes(author), author);
+  for (const file of ["wind-woodland", "wind-pines", "dawn-foothills", "call-laughingthrush", "call-barbet"]) {
+    const response = await fetch(`${origin}/media/audio/${file}.mp3`);
+    assert.equal(response.status, 200, file);
+  }
+});
+
 test("the retired /collection route permanently redirects to /whisky", async () => {
   const response = await fetch(origin + "/collection", { redirect: "manual" });
   assert.equal(response.status, 308);

@@ -1,11 +1,11 @@
-import { brand, nav } from "@/content/site";
+import { brand, nav, soundCredits } from "@/content/site";
 import { Emblem } from "./Emblem";
 import { TransitionLink } from "./transition/TransitionLink";
 import styles from "./Footer.module.css";
 
 export function Footer() {
   return (
-    <footer className={styles.footer}>
+    <footer className={styles.footer} data-soundscape="breeze">
       <div className={styles.top}>
         <div className={styles.brand}>
           <Emblem className={styles.mark} />
@@ -34,6 +34,17 @@ export function Footer() {
           <TransitionLink href="/responsible-drinking">Responsible Drinking</TransitionLink>
         </span>
       </div>
+      <details className={styles.credits}>
+        <summary>Sound credits</summary>
+        <ul>
+          {soundCredits.map((c) => (
+            <li key={c.source}>
+              {c.subject} — <a href={c.source} target="_blank" rel="noreferrer">{c.author}</a>, <a href={c.licenseUrl} target="_blank" rel="noreferrer">{c.license}</a>
+            </li>
+          ))}
+          <li>Tonal and air textures are synthesized in the browser. Recordings are edited (looped, layered and mixed).</li>
+        </ul>
+      </details>
     </footer>
   );
 }

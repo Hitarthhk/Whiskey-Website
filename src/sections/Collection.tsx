@@ -107,7 +107,9 @@ export function Collection({ headingLevel = 2, showCta = true }: { headingLevel?
   }, [active, handoff, exp.id]);
 
   return (
-    <section ref={ref} className={styles.section} data-mode={cinematic ? "cinematic" : "simple"} data-embedded={linked} data-linked={!!handoff} inert={linked && !settled} aria-labelledby="collection-title">
+    <section ref={ref} className={styles.section} data-mode={cinematic ? "cinematic" : "simple"} data-embedded={linked} data-linked={!!handoff} inert={linked && !settled}
+      // Embedded in the showcase's stage: it sets the mood only once visible.
+      data-soundscape={!linked || galleryVisible ? "collection" : undefined} aria-labelledby="collection-title">
       <CollectionEnvironment active={exp.id} opacity={environment} reduced={reduced} world={world} shift={shift} onPrepared={markPrepared} />
       <div data-collection-stage className={styles.stage}>
         <m.div ref={details} data-collection-details className={styles.details} style={{ opacity: arrival, y: detailY }}>

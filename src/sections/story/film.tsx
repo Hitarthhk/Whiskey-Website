@@ -19,7 +19,7 @@ const ScreenContext = createContext<HTMLElement | null>(null);
 export function Film({ children }: { children: ReactNode }) {
   const [screen, setScreen] = useState<HTMLDivElement | null>(null);
   return (
-    <div className={styles.film} data-story-film>
+    <div className={styles.film} data-story-film data-soundscape="forest">
       <div className={styles.track} aria-hidden="true">
         <div ref={setScreen} className={styles.screen} />
       </div>

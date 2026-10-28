@@ -89,7 +89,7 @@ export function Hero() {
   );
 
   return (
-    <section ref={ref} className={styles.hero} data-hero-handoff={!!handoff} aria-labelledby="hero-title">
+    <section ref={ref} className={styles.hero} data-hero-handoff={!!handoff} data-soundscape="hero" aria-labelledby="hero-title">
       <div data-stage className={styles.stage}>
         <div data-dive-hero-camera className={styles.entryCamera}>
           <HeroPhoto />
