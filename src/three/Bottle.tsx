@@ -5,6 +5,7 @@ import { Suspense, useEffect, useRef, type RefObject } from "react";
 import { Group, MathUtils, PerspectiveCamera, PointLight } from "three";
 import { range } from "@/animation/useScene";
 import type { Expression } from "@/content/site";
+import { Precompile } from "./Precompile";
 import { designs } from "./bottles/designs";
 import { GamberBottle, type Quality } from "./bottles/GamberBottle";
 import { curve } from "./bottles/loft";
@@ -166,6 +167,7 @@ export function Bottle({ expression, progress, quality, mode, idle, drag, onRead
         <group position={[0, -design.height / 2, 0]}>
           <Suspense fallback={null}>
             <GamberBottle expression={expression} quality={quality} />
+            <Precompile />
             {onReady && <ModelLoaded loaded={modelLoaded} />}
           </Suspense>
         </group>

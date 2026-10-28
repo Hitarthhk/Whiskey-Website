@@ -9,6 +9,7 @@ import { WebGLBoundary } from "@/components/WebGLBoundary";
 import { collection, type Expression, type ExpressionId } from "@/content/site";
 import { useDragRotate, type DragState } from "@/three/useDragRotate";
 import { useQuality } from "@/three/useQuality";
+import { cancelIdle, whenIdle } from "@/three/Precompile";
 import { m, useMotionValue, useMotionValueEvent, useTransform } from "motion/react";
 import { useHeroBottleHandoff } from "@/components/transition/HeroBottleHandoff";
 import { useMotionThreshold } from "@/animation/useMotionThreshold";
@@ -65,6 +66,14 @@ export function Collection({ headingLevel = 2, showCta = true }: { headingLevel?
   }, [linked, p, presentation]);
   const settled = useMotionThreshold(p, 0.995);
   const galleryNear = useMotionThreshold(p, 0.82, true);
+  // Create the canvas in idle time (usually while the age gate is open), so
+  // its shaders compile in the background instead of mid-scroll.
+  const [warm, setWarm] = useState(false);
+  useEffect(() => {
+    if (!linked) return;
+    const id = whenIdle(() => setWarm(true), 6000);
+    return () => cancelIdle(id);
+  }, [linked]);
   const galleryVisible = useMotionThreshold(p, 0.9);
   const [modelReady, setModelReady] = useState(false);
   const onModelReady = useCallback(() => setModelReady(true), []);
@@ -151,7 +160,7 @@ export function Collection({ headingLevel = 2, showCta = true }: { headingLevel?
         </m.div>
 
         <div className={styles.pair}>
-          {use3D && (!linked || galleryNear) && (
+          {use3D && (!linked || galleryNear || warm) && (
             <m.div className={styles.models} style={{ opacity: second }}>
             <WebGLBoundary onError={failGPU} fallback={null}>
               <CollectionStage key={String(linked)} omitFirst={linked} rendering={!linked || galleryVisible} world={world} onReady={onModelReady} onUnavailable={failGPU} expressions={collection.expressions} active={active} slots={slots} drags={drags} quality={quality} idle={!reduced} className={`${styles.models} ${modelReady ? styles.modelsReady : ""}`} />

@@ -104,19 +104,20 @@ export function BottleFeature({ expression = expressionById("private-edition-i")
       // Copy beats, timed to the bottle's moves in Bottle.tsx.
       const beat = (i: number, at: number, out: number) => {
         const s = steps[i];
-        tl.fromTo(s, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.02 }, at)
+        // Eased fades a few times longer than a wheel notch, so copy breathes in rather than pops.
+        tl.fromTo(s, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.05, ease: "sine.inOut" }, at)
           .from(splits[i].lines, { yPercent: 110, stagger: 0.015, duration: 0.08, ease: EASE.rise }, at)
           .from(s.querySelectorAll("[data-step-fade]"), { autoAlpha: 0, y: 30, stagger: 0.02, duration: 0.08 }, at + 0.03)
-          .to(s, { autoAlpha: 0, y: -40, duration: 0.06 }, out);
+          .to(s, { autoAlpha: 0, y: -40, duration: 0.06, ease: "sine.inOut" }, out);
       };
       if (handoff) {
         // The original rise finishes at 0.28. Join that settled pose with the
         // introduction, then clear the space before The Nose at .44.
         const intro = steps[0];
-        tl.fromTo(intro, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.025 }, 0.28)
+        tl.fromTo(intro, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.045, ease: "sine.inOut" }, 0.28)
           .from(splits[0].lines, { yPercent: 110, stagger: 0.006, duration: 0.05, ease: EASE.rise }, 0.285)
           .from(intro.querySelectorAll("[data-step-fade]"), { autoAlpha: 0, y: 12, stagger: 0.012, duration: 0.045 }, 0.3)
-          .to(intro, { autoAlpha: 0, y: -20, duration: 0.04 }, 0.39);
+          .to(intro, { autoAlpha: 0, y: -20, duration: 0.045, ease: "sine.inOut" }, 0.39);
       } else {
         beat(0, 0.1, 0.3);
       }

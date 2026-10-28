@@ -1,7 +1,7 @@
 "use client";
 
 import { Canvas } from "@react-three/fiber";
-import { Environment, Lightformer } from "@react-three/drei";
+import { Environment, Lightformer, PerformanceMonitor } from "@react-three/drei";
 import { useEffect, useRef, useState, type RefObject } from "react";
 import type { Expression } from "@/content/site";
 import { Bottle, CAMERA, type Quality } from "./Bottle";
@@ -37,6 +37,7 @@ export default function BottleStage({ expression, backdrop, progress, quality, m
   const host = useRef<HTMLDivElement>(null);
   const [near, setNear] = useState(false);
   const [visible, setVisible] = useState(false);
+  const [struggling, setStruggling] = useState(false);
   const drag = useDragRotate(host);
   const light = designs[expression.id].light;
 
@@ -56,11 +57,13 @@ export default function BottleStage({ expression, backdrop, progress, quality, m
       {near && (
         <Canvas
           frameloop={visible ? "always" : "never"}
-          dpr={quality === "high" ? [1, 1.75] : [1, 1.25]}
+          dpr={struggling ? 1 : quality === "high" ? [1, 1.75] : [1, 1.25]}
           camera={{ position: [0, 0, CAMERA.z], fov: CAMERA.fov }}
           gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
           aria-hidden="true"
         >
+          {/* Sustained low frame rates drop to 1× pixels for the rest of the visit. */}
+          <PerformanceMonitor onDecline={() => setStruggling(true)} />
           <TransmissionBackdrop color={backdrop} />
           {onUnavailable && <ContextLossGuard onUnavailable={onUnavailable} />}
           <WhiskyLighting expression={expression} gallery={gallery} progress={progress} reduced={!idle} />

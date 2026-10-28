@@ -23,7 +23,7 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!ready || reduced || touch) return;
-    const instance = new Lenis({ lerp: 0.09, wheelMultiplier: 0.9, syncTouch: false });
+    const instance = new Lenis({ lerp: 0.075, wheelMultiplier: 0.9, syncTouch: false });
     instance.on("scroll", ScrollTrigger.update);
     const tick = (time: number) => instance.raf(time * 1000);
     gsap.ticker.add(tick);

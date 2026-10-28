@@ -1,7 +1,7 @@
 "use client";
 
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Environment, Lightformer } from "@react-three/drei";
+import { Environment, Lightformer, PerformanceMonitor } from "@react-three/drei";
 import { Suspense, useEffect, useRef, useState, type RefObject } from "react";
 import type { MotionValue } from "motion/react";
 import { Group, MathUtils, SpotLight } from "three";
@@ -12,6 +12,7 @@ import { GamberBottle, type Quality } from "./bottles/GamberBottle";
 import { stepDrag, type DragState } from "./useDragRotate";
 import { WhiskyLighting } from "./WhiskyLighting";
 import { ContextLossGuard } from "./ContextLossGuard";
+import { Precompile } from "./Precompile";
 import { TransmissionBackdrop } from "./useTransmissionBackdrop";
 
 type Props = {
@@ -41,6 +42,7 @@ export default function CollectionStage({ expressions, active, slots, drags, qua
   const host = useRef<HTMLDivElement>(null);
   const [near, setNear] = useState(false);
   const [visible, setVisible] = useState(false);
+  const [struggling, setStruggling] = useState(false);
 
   useEffect(() => {
     const el = host.current;
@@ -68,11 +70,13 @@ export default function CollectionStage({ expressions, active, slots, drags, qua
       {near && (
         <Canvas
           frameloop={visible && rendering ? "always" : "never"}
-          dpr={quality === "high" ? [1, 1.75] : [1, 1.25]}
+          dpr={struggling ? 1 : quality === "high" ? [1, 1.75] : [1, 1.25]}
           camera={{ position: [0, 0, CAMERA.z], fov: CAMERA.fov }}
           gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
           aria-hidden="true"
         >
+          {/* Sustained low frame rates drop to 1× pixels for the rest of the visit. */}
+          <PerformanceMonitor onDecline={() => setStruggling(true)} />
           <TransmissionBackdrop color={backdrop} />
           <ContextLossGuard onUnavailable={onUnavailable} />
           <WhiskyLighting expression={expressions[active]} collection reduced={!idle} world={world} />
@@ -146,6 +150,7 @@ function SlotBottle({ expression, active, host, slots, drags, quality, idle, onR
         <group position={[0, -design.height / 2, 0]}>
           <Suspense fallback={null}>
             <GamberBottle expression={expression} quality={quality} />
+            <Precompile />
             <Loaded flag={loaded} />
           </Suspense>
         </group>

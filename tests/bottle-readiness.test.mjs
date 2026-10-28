@@ -61,6 +61,7 @@ function fixture({ readyCallback = true, gallery = false } = {}) {
       if (id === "@/animation/useScene") return { range: (p, start, end) => Math.min(1, Math.max(0, (p - start) / (end - start))) };
       if (id === "./useDragRotate") return { stepDrag: () => 0 };
       if (id === "./bottles/GamberBottle") return { GamberBottle: () => null };
+      if (id === "./Precompile") return { Precompile: () => null };
       if (id.startsWith(".")) {
         const candidate = resolve(dirname(path), `${id}.ts`);
         if (existsSync(candidate)) return load(candidate);
