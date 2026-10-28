@@ -1,9 +1,12 @@
 "use client";
 
 import { useRef } from "react";
-import { EASE, gsap, SplitText, useScene } from "@/animation";
+import { gsap, useScene, useMotion } from "@/animation";
+import { m, useMotionValue, useTransform } from "motion/react";
+import { useHeroBottleHandoff } from "@/components/transition/HeroBottleHandoff";
+import { HERO_COPY, HERO_DESCRIPTION, HANDOFF_CUE } from "@/components/transition/heroBottleProgress";
 import { useEntered } from "@/components/AgeGate";
-import { HimalayaLandscape } from "@/components/landscape/HimalayaLandscape";
+import { HeroPhoto } from "@/components/landscape/HeroPhoto";
 import { hero } from "@/content/site";
 import styles from "./Hero.module.css";
 
@@ -15,6 +18,13 @@ import styles from "./Hero.module.css";
 export function Hero() {
   const ref = useRef<HTMLElement>(null);
   const entered = useEntered();
+  const handoff = useHeroBottleHandoff();
+  const unlinked = useMotionValue(0);
+  const { reduced } = useMotion();
+  const copyOpacity = useTransform(handoff?.progress ?? unlinked, HERO_COPY.input, HERO_COPY.opacity);
+  const copyY = useTransform(handoff?.progress ?? unlinked, HERO_COPY.input, HERO_COPY.y);
+  const cueOpacity = useTransform(handoff?.progress ?? unlinked, HANDOFF_CUE.input, HANDOFF_CUE.output);
+  const descriptionOpacity = useTransform(handoff?.progress ?? unlinked, HERO_DESCRIPTION.input, HERO_DESCRIPTION.output);
 
   useScene(
     ref,
@@ -23,28 +33,7 @@ export function Hero() {
       const layers = q<HTMLElement>("[data-layer]");
       const inners = q<HTMLElement>("[data-layer-inner]");
       const depth = (el: Element) => Number((el as HTMLElement).dataset.depth ?? 0);
-      const headline = q("[data-headline]")[0] as HTMLElement;
-      const copy = q("[data-intro]");
-
-      if (!entered) {
-        gsap.set([headline, copy], { autoAlpha: 0 });
-        return;
-      }
-
-      // ---- Intro: camera settles, the headline is set in type ----
-      if (!motion) {
-        gsap.to([headline, copy], { autoAlpha: 1, duration: 0.8, stagger: 0.1 });
-        return;
-      }
-      const split = SplitText.create(headline, { type: "words,chars", mask: "chars" });
-      gsap.set(headline, { autoAlpha: 1 });
-      const intro = gsap.timeline({ defaults: { ease: EASE.rise } });
-      intro
-        .from(inners, { yPercent: (i, el) => 4 + depth(el.parentElement!) * 10, scale: 1.08, duration: 3.2, stagger: 0.08 }, 0)
-        .from(q("[data-sky]"), { autoAlpha: 0.4, duration: 3 }, 0)
-        .from(q("[data-sun]"), { scale: 0.6, autoAlpha: 0, duration: 4 }, 0.3)
-        .from(split.chars, { yPercent: 120, rotate: 6, duration: 1.6, stagger: 0.04 }, 0.7)
-        .from(copy, { autoAlpha: 0, y: 24, duration: 1.4, stagger: 0.15 }, 1.4);
+      if (!motion) return;
 
       // ---- Pointer parallax: depth-weighted, pointer devices only ----
       let removePointer = () => {};
@@ -70,8 +59,11 @@ export function Hero() {
       const travel = gsap.timeline({
         defaults: { ease: "none" },
         scrollTrigger: desktop
-          ? { trigger: root, start: "top top", end: "+=220%", scrub: 1, pin: q("[data-stage]")[0], anticipatePin: 1 }
-          : { trigger: root, start: "top top", end: "bottom top", scrub: 0.6 },
+          ? { trigger: root, start: "top top", end: "+=220%", scrub: 1, pin: q("[data-stage]")[0], pinSpacing: !handoff, anticipatePin: 1 }
+          : { trigger: root, start: "top top", end: "bottom top", scrub: 0.6,
+            // Unpinned copy must leave before it scrolls behind the fixed nav;
+            // the shorter mobile overlap still exposes the bottle immediately.
+            onUpdate: self => handoff?.progress.set(self.progress * 0.8) },
       });
       const reach = desktop ? 1 : 0.45; // shorter, gentler move on phones
       layers.forEach((el) => {
@@ -82,40 +74,49 @@ export function Hero() {
       travel
         .to(q("[data-fog]"), { yPercent: -40, scale: 1.5, opacity: 0.95, duration: 1, stagger: 0.02 }, 0)
         .to(q("[data-sky]"), { yPercent: 8, duration: 1 }, 0)
-        .to(q("[data-sun]"), { scale: 1.4, yPercent: -10, duration: 1 }, 0)
-        .to(q("[data-copy]"), { yPercent: -30, autoAlpha: 0, duration: 0.35 }, 0.04)
-        .to(q("[data-cue]"), { autoAlpha: 0, duration: 0.1 }, 0)
-        .fromTo(q("[data-flood]"), { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.4 }, 0.6);
+        .to(q("[data-sun]"), { scale: 1.4, yPercent: -10, duration: 1 }, 0);
+      if (!handoff) {
+        travel.to(q("[data-copy]"), { yPercent: -30, autoAlpha: 0, duration: 0.35 }, 0.04)
+          .to(q("[data-cue]"), { autoAlpha: 0, duration: 0.1 }, 0)
+          .fromTo(q("[data-flood]"), { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.4 }, 0.6);
+      }
 
       return () => {
         removePointer();
-        split.revert();
       };
     },
-    [entered],
+    [handoff],
   );
 
   return (
-    <section ref={ref} className={styles.hero} aria-labelledby="hero-title">
+    <section ref={ref} className={styles.hero} data-hero-handoff={!!handoff} aria-labelledby="hero-title">
       <div data-stage className={styles.stage}>
-        <HimalayaLandscape />
+        <div data-dive-hero-camera className={styles.entryCamera}>
+          <HeroPhoto />
+        </div>
         <div className={styles.vignette} aria-hidden="true" />
-        <div data-copy className={styles.copy}>
-          <p data-intro className="eyebrow">
+        <m.div data-copy className={styles.copy} style={handoff ? { opacity: reduced ? 1 : copyOpacity, y: reduced ? "0%" : copyY } : undefined}>
+          <div data-dive-copy className={styles.entryCopy} style={{ opacity: entered ? 1 : 0 }}>
+          <p data-intro data-dive-support className="eyebrow">
             {hero.eyebrow}
           </p>
-          <h1 id="hero-title" data-headline className={`display ${styles.title}`} style={{ visibility: "hidden" }}>
-            {hero.headline[0]} <em>{hero.headline[1]}</em>
+          <h1 id="hero-title" data-headline className={`display ${styles.title}`}>
+            <span data-dive-title className={styles.headlineLine}>{hero.headline[0]}</span> <em data-dive-title>{hero.headline[1]}</em>
           </h1>
-          <p data-intro className={`lede ${styles.sub}`}>
+          <m.div data-hero-description style={handoff ? { opacity: reduced ? 1 : descriptionOpacity } : undefined}>
+          <p data-intro data-dive-support className={`lede ${styles.sub}`}>
             {hero.sub}
           </p>
-        </div>
-        <div data-cue data-intro className={styles.cue} aria-hidden="true">
+          </m.div>
+          </div>
+        </m.div>
+        <m.div data-cue data-intro className={styles.cue} style={handoff ? { opacity: reduced ? 1 : cueOpacity } : undefined} aria-hidden="true">
+          <div data-dive-cue className={styles.entryCue} style={{ opacity: entered ? 1 : 0 }}>
           <span>Scroll to begin the ascent</span>
           <i />
-        </div>
-        <div data-flood className={styles.flood} aria-hidden="true" />
+          </div>
+        </m.div>
+        {!handoff && <div data-flood className={styles.flood} aria-hidden="true" />}
       </div>
     </section>
   );

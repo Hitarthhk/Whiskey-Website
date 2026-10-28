@@ -1,3 +1,6 @@
+/* After the homepage's and Our Story's twilight scenes the night simply continues into the
+   footer: no dividing line. */
+:global(main:has([data-scene="twilight"], [data-story-closing])) + .footer { border-top-color: transparent; }
 .footer {
   position: relative;
   padding: 120px var(--gutter) 36px;

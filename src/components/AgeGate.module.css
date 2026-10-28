@@ -12,54 +12,15 @@
     linear-gradient(180deg, #05090c 0%, var(--alpine-midnight) 55%, #0c141a 100%);
 }
 
-/* ---------- The midnight range ---------- */
-.scene {
-  position: fixed;
-  inset: 0;
-  overflow: hidden;
-  transform-origin: 50% 60%;
-  pointer-events: none;
+.gate[data-exiting="true"] {
+  /* The actual hero is uncovered as the night layer and fog pass away. */
+  background: transparent;
+  will-change: opacity;
 }
-.scene picture {
-  display: contents;
-}
-.scene [data-scene-img] {
-  position: absolute;
-  inset: 0;
-  object-position: 50% 50%;
-}
-.dawn {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-}
-/* Barely-there valley mist, drifting slowly across the foothills. */
-.mist {
-  position: absolute;
-  left: -15%;
-  right: -15%;
-  bottom: 4%;
-  height: 34%;
-  opacity: 0.16;
-  filter: brightness(0.38) saturate(0.6);
-  animation: mist 70s ease-in-out infinite alternate;
-}
-.mist [data-scene-img] {
-  object-fit: fill;
-}
-@keyframes mist {
-  to {
-    transform: translateX(-8%);
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .mist {
-    animation: none;
-  }
-}
+.emblem { position: relative; width: 84px; }
 /* Keeps the question legible over the scene without dimming the peaks. */
 .veil {
-  position: fixed;
+  position: absolute;
   inset: 0;
   pointer-events: none;
   background: radial-gradient(60% 55% at 50% 50%, rgba(8, 13, 17, 0.5), rgba(8, 13, 17, 0.08) 70%, transparent);
@@ -130,18 +91,6 @@
 .ghost:hover {
   background: rgba(165, 183, 194, 0.14);
   border-color: var(--glacier-grey);
-}
-.remember {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  font-size: 13px;
-  color: var(--snow-ivory-70);
-}
-.remember input {
-  accent-color: var(--whisky-amber);
-  width: 16px;
-  height: 16px;
 }
 .legal {
   font-size: 12px;

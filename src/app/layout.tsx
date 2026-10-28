@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Manrope } from "next/font/google";
-import { MotionProvider, SmoothScroll } from "@/animation";
+import { MotionProvider, MotionUIProvider, SmoothScroll } from "@/animation";
 import { AgeGate } from "@/components/AgeGate";
 import { Footer } from "@/components/Footer";
 import { Nav } from "@/components/Nav";
@@ -31,19 +31,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${cormorant.variable} ${manrope.variable}`}>
       <body>
         <MotionProvider>
-          <SmoothScroll>
-            <TransitionProvider>
-              <a href="#main" className="skip-link">
-                Skip to content
-              </a>
-              <AgeGate>
-                <Nav />
-                <main id="main" tabIndex={-1}>{children}</main>
-                <Footer />
-              </AgeGate>
-              <div className="grain" aria-hidden="true" />
-            </TransitionProvider>
-          </SmoothScroll>
+          <MotionUIProvider>
+            <SmoothScroll>
+              <TransitionProvider>
+                <a href="#main" className="skip-link">
+                  Skip to content
+                </a>
+                <AgeGate>
+                  <Nav />
+                  <main id="main" tabIndex={-1}>{children}</main>
+                  <Footer />
+                </AgeGate>
+                <div className="grain" aria-hidden="true" />
+              </TransitionProvider>
+            </SmoothScroll>
+          </MotionUIProvider>
         </MotionProvider>
       </body>
     </html>

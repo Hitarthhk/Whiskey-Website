@@ -176,6 +176,17 @@ p {
   opacity: 1;
 }
 
+/* A completed entry must win over late animation writes after cancellation.
+   These markers apply only to camera/entry wrappers, never GSAP scroll layers. */
+[data-dive-settled="true"] {
+  opacity: 1 !important;
+  transform: none !important;
+}
+[data-dive-dismissed="true"] {
+  opacity: 0 !important;
+  pointer-events: none;
+}
+
 /* Film grain — one static texture, composited once. */
 .grain {
   position: fixed;

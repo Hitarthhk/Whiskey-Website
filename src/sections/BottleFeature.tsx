@@ -1,14 +1,20 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState, type ReactNode } from "react";
+import { preload } from "react-dom";
 import { EASE, gsap, Reveal, SplitText, useMotion, useScene } from "@/animation";
 import { ProductImage } from "@/components/ProductImage";
 import { WebGLBoundary } from "@/components/WebGLBoundary";
 import { ClaimText, PendingTag } from "@/components/Pending";
-import { expressionById, type Expression } from "@/content/site";
+import { bottleIntroduction, expressionById, type Expression } from "@/content/site";
 import { useQuality } from "@/three/useQuality";
 import styles from "./BottleFeature.module.css";
+import { m, useMotionValue, useTransform } from "motion/react";
+import { useHeroBottleHandoff } from "@/components/transition/HeroBottleHandoff";
+import { BottleValley, VALLEY_BACKDROP } from "@/components/landscape/BottleValley";
+import { GALLERY, GALLERY_MOVE, COLLECTION_HOLD } from "@/components/transition/bottleCollectionProgress";
+import { BOTTLE_NOTE } from "@/components/transition/heroBottleProgress";
 
 const BottleStage = dynamic(() => import("@/three/BottleStage"), { ssr: false });
 
@@ -19,15 +25,27 @@ const BottleStage = dynamic(() => import("@/three/BottleStage"), { ssr: false })
  * drag-to-turn 3D bottle beside stacked copy. Without WebGL the reference
  * photograph takes the same 2D choreography.
  */
-export function BottleFeature({ expression = expressionById("private-edition-i") }: { expression?: Expression }) {
+export function BottleFeature({ expression = expressionById("private-edition-i"), children }: { expression?: Expression; children?: ReactNode }) {
   const ref = useRef<HTMLElement>(null);
   const progress = useRef(0);
+  const handoff = useHeroBottleHandoff();
+  const gallery = children ? handoff?.gallery : undefined;
+  const localProgress = useMotionValue(0);
+  const sceneProgress = handoff?.progress ?? localProgress;
+  const valleyOpacity = useTransform(sceneProgress, GALLERY.environment.input, [1, 0.65, 0]);
+  const pointer = useTransform(sceneProgress, value => value >= 0.91 ? "none" : "auto");
+  const noteOpacity = useTransform(sceneProgress, gallery ? [...BOTTLE_NOTE.input, 0.86, 0.93] : BOTTLE_NOTE.input, gallery ? [...BOTTLE_NOTE.output, 1, 0] : BOTTLE_NOTE.output);
   const { ready, reduced, mobile, webgl } = useMotion();
   const [gpuFailed, setGpuFailed] = useState(false);
+  const failGPU = useCallback(() => setGpuFailed(true), []);
+  const [canvasReady, setCanvasReady] = useState(false);
+  const markCanvasReady = useCallback(() => setCanvasReady(true), []);
   const cinematic = !ready || (!reduced && !mobile);
   const use3D = ready && webgl && !gpuFailed;
+  const showGPU = use3D && canvasReady;
   const mode = ready && !reduced && !mobile ? "scroll" : "static";
   const quality = useQuality();
+  if (handoff) preload(expression.image.src, { as: "image", fetchPriority: "high" });
 
   useScene(
     ref,
@@ -40,9 +58,11 @@ export function BottleFeature({ expression = expressionById("private-edition-i")
           gsap.fromTo(q("[data-bottle-2d]"), { yPercent: 30, autoAlpha: 0 }, {
             yPercent: 0,
             autoAlpha: 1,
-            duration: 1.8,
+            duration: handoff ? 1 : 1.8,
             ease: EASE.rise,
-            scrollTrigger: { trigger: root, start: "top 75%", once: true },
+            scrollTrigger: handoff
+              ? { trigger: root, start: "top bottom", end: "top 55%", scrub: true }
+              : { trigger: root, start: "top 75%", once: true },
           });
           gsap.fromTo(q("[data-highlight]"), { x: 0 }, { x: 120, ease: "none", scrollTrigger: { trigger: root, start: "top bottom", end: "bottom top", scrub: true } });
         }
@@ -57,14 +77,21 @@ export function BottleFeature({ expression = expressionById("private-edition-i")
         scrollTrigger: {
           trigger: root,
           start: "top top",
-          end: "+=320%",
+          end: gallery ? `+=${320 + COLLECTION_HOLD.scrollPercent}%` : "+=320%",
           scrub: true,
           pin: q("[data-stage]")[0],
           anticipatePin: 1,
-          onUpdate: (self) => (progress.current = self.progress),
+          invalidateOnRefresh: true,
+          onUpdate: (self) => {
+            const p = Math.min(1, self.progress * (gallery ? COLLECTION_HOLD.timelineEnd : 1));
+            progress.current = p;
+            sceneProgress.set(p);
+          },
         },
       });
-      tl.set({}, {}, 1); // timeline length = 1 so positions read as scroll progress
+      // The existing cues still occupy exactly 320vh. Only the settled
+      // collection occupies the extra tail, before the shared pin releases.
+      tl.set({}, {}, gallery ? COLLECTION_HOLD.timelineEnd : 1);
 
       // Fog the bottle rises out of, and the halo of light behind it.
       tl.to(q("[data-mist]"), { yPercent: 60, autoAlpha: 0, duration: 0.3 }, 0)
@@ -81,57 +108,122 @@ export function BottleFeature({ expression = expressionById("private-edition-i")
           .from(s.querySelectorAll("[data-step-fade]"), { autoAlpha: 0, y: 30, stagger: 0.02, duration: 0.08 }, at + 0.03)
           .to(s, { autoAlpha: 0, y: -40, duration: 0.06 }, out);
       };
-      beat(0, 0.1, 0.3);
+      if (handoff) {
+        // The original rise finishes at 0.28. Join that settled pose with the
+        // introduction, then clear the space before The Nose at .44.
+        const intro = steps[0];
+        tl.fromTo(intro, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.025 }, 0.28)
+          .from(splits[0].lines, { yPercent: 110, stagger: 0.006, duration: 0.05, ease: EASE.rise }, 0.285)
+          .from(intro.querySelectorAll("[data-step-fade]"), { autoAlpha: 0, y: 12, stagger: 0.012, duration: 0.045 }, 0.3)
+          .to(intro, { autoAlpha: 0, y: -20, duration: 0.04 }, 0.39);
+      } else {
+        beat(0, 0.1, 0.3);
+      }
       beat(1, 0.44, 0.6);
       beat(2, 0.7, 0.86);
 
       // 2D bottle shares the same choreography when WebGL is unavailable.
       const flat = q("[data-bottle-2d]");
       if (flat.length) {
-        tl.fromTo(flat, { yPercent: 70, autoAlpha: 0 }, { yPercent: 0, autoAlpha: 1, duration: 0.28 }, 0)
-          .to(flat, { x: () => -innerWidth * 0.22, duration: 0.18 }, 0.32) // glide by viewport, not bottle width
+        if (handoff) {
+          // Match the existing Three.js cubic rise, beginning below the frame.
+          // Opacity settles early; visibility must not lag behind position.
+          tl.fromTo(flat, { yPercent: 125 }, { yPercent: 0, duration: 0.28, ease: "power2.out" }, 0)
+            .fromTo(flat, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.045 }, 0);
+        } else {
+          tl.fromTo(flat, { yPercent: 70, autoAlpha: 0 }, { yPercent: 0, autoAlpha: 1, duration: 0.28 }, 0);
+        }
+        tl.to(flat, { x: () => -innerWidth * 0.22, duration: 0.18 }, 0.32) // glide by viewport, not bottle width
           .to(flat, { x: () => innerWidth * 0.22, duration: 0.18 }, 0.58)
-          .to(flat, { x: 0, yPercent: -120, autoAlpha: 0, duration: 0.16 }, 0.84)
           .fromTo(q("[data-highlight]"), { x: 0 }, { x: 120, duration: 1 }, 0);
       }
 
+      if (gallery) {
+        const target = () => {
+          const photo = q<HTMLElement>("[data-bottle-2d]")[0];
+          const frame = photo?.parentElement?.getBoundingClientRect();
+          const slot = gallery.slot.current?.getBoundingClientRect();
+          if (!frame || !slot) return { x: innerWidth * 0.22, y: 0, scale: 1 };
+          const ratio = expression.image.width / expression.image.height;
+          const baseHeight = Math.min(frame.height * 0.72, innerWidth * 0.42 / ratio);
+          const baseWidth = baseHeight * ratio;
+          return {
+            x: slot.left + slot.width / 2 - frame.left - frame.width / 2,
+            y: slot.top + slot.height / 2 - frame.top - frame.height / 2,
+            scale: Math.min(slot.height * 0.84 / baseHeight, slot.width * 0.86 / baseWidth),
+          };
+        };
+        // The same timeline owns the photo throughout: no competing setters
+        // when scrubbing backward across the handoff boundary.
+        tl.to(flat, { x: () => target().x, y: () => target().y, scale: () => target().scale,
+          duration: GALLERY_MOVE.end - GALLERY_MOVE.start, ease: (t: number) => t * t * (3 - 2 * t) }, GALLERY_MOVE.start);
+      } else {
+        tl.to(flat, { x: 0, yPercent: -120, autoAlpha: 0, duration: 0.16 }, 0.84);
+      }
       return () => splits.forEach((s) => s.revert());
     },
-    [use3D],
+    // Keep the linked fallback and pin alive while the canvas initializes.
+    // GPU readiness changes only the outer visual layers, never this timeline.
+    [handoff ? null : use3D, sceneProgress, gallery],
   );
 
   const [s0, s1, s2] = expression.showcase;
+  const intro = handoff ? bottleIntroduction : s0;
+  const stackedCopy = handoff ? [bottleIntroduction, s1, s2] : expression.showcase;
 
   return (
     <section
       ref={ref}
       className={styles.section}
       data-mode={cinematic ? "cinematic" : "simple"}
+      data-handoff={!!handoff}
+      data-gallery-linked={!!gallery}
       aria-label={expression.name}
       style={{ "--stage-from": expression.stage[0], "--stage-to": expression.stage[1] } as React.CSSProperties}
     >
       <div data-stage className={styles.stage}>
+        <m.div className={styles.showcase} style={{ "--bottle-pointer": pointer } as import("motion/react").MotionStyle}>
+        {handoff && <m.div className={styles.visualLayer} style={{ opacity: gallery && cinematic ? valleyOpacity : 1 }}><BottleValley progress={sceneProgress} linked reduced={reduced} gallery={!!gallery} /></m.div>}
         <div data-mist className={styles.mist} aria-hidden="true" />
         <div data-halo className={styles.halo} aria-hidden="true" />
 
-        <div data-step className={`${styles.step} ${styles.center}`}>
-          <p data-step-fade className="eyebrow">{s0.kicker}</p>
-          <h2 data-step-title className={`display ${styles.giant}`}>{s0.title}</h2>
+        <div data-step data-bottle-intro className={`${styles.step} ${handoff ? styles.intro : styles.center}`}>
+          <p data-step-fade className="eyebrow">{intro.kicker}</p>
+          <h2 data-step-title className={`display ${handoff ? styles.introTitle : styles.giant}`}>{intro.title}</h2>
+          {handoff && <p data-step-fade className={styles.introBody}>{bottleIntroduction.body.text}</p>}
         </div>
 
         <div className={styles.object}>
-          {use3D ? (
+          {handoff ? (
+            <>
+              <m.div data-bottle-photo className={styles.visualLayer} initial={false}
+                animate={{ opacity: showGPU ? 0 : 1 }} transition={{ duration: showGPU ? (reduced ? 0.12 : 0.24) : 0 }}>
+                <div data-bottle-2d className={styles.flat}>
+                  <ProductImage expression={expression} className={styles.svg} />
+                </div>
+              </m.div>
+              {use3D && (
+                <m.div data-bottle-gpu className={styles.visualLayer} initial={false}
+                  animate={{ opacity: showGPU ? 1 : 0 }} transition={{ duration: reduced ? 0.12 : 0.24 }}
+                  style={{ pointerEvents: showGPU ? "auto" : "none" }}>
+                  <WebGLBoundary onError={failGPU} fallback={null}>
+                    <BottleStage expression={expression} backdrop={VALLEY_BACKDROP} progress={progress} quality={quality} mode={mode} idle={!reduced} className={styles.canvas} gallery={gallery} onReady={markCanvasReady} onUnavailable={failGPU} />
+                  </WebGLBoundary>
+                </m.div>
+              )}
+            </>
+          ) : use3D ? (
             <WebGLBoundary onError={() => setGpuFailed(true)} fallback={<div className={styles.flat}><ProductImage expression={expression} className={styles.svg} /></div>}>
-              <BottleStage expression={expression} backdrop={expression.stage[0]} progress={progress} quality={quality} mode={mode} idle={!reduced} className={styles.canvas} />
+              <BottleStage expression={expression} backdrop={handoff ? VALLEY_BACKDROP : expression.stage[0]} progress={progress} quality={quality} mode={mode} idle={!reduced} className={styles.canvas} />
             </WebGLBoundary>
           ) : (
             <div data-bottle-2d className={styles.flat}>
               <ProductImage expression={expression} className={styles.svg} />
             </div>
           )}
-          <span className={styles.placeholder}>
+          <m.span data-bottle-note className={styles.placeholder} style={{ opacity: handoff && !reduced ? noteOpacity : 1 }}>
             <PendingTag>{use3D ? "3D rendering from reference photography · drag to turn" : "Reference photography"}</PendingTag>
-          </span>
+          </m.span>
         </div>
 
         <div data-step className={`${styles.step} ${styles.right}`}>
@@ -149,11 +241,11 @@ export function BottleFeature({ expression = expressionById("private-edition-i")
             <ClaimText claim={s2.body} className={styles.body} />
           </div>
         </div>
-      </div>
+        </m.div>
 
       {/* Stacked copy for phones and reduced motion */}
       <Reveal className={styles.stack} stagger={0.12}>
-        {expression.showcase.map((s) => (
+        {stackedCopy.map((s) => (
           <div key={s.kicker} data-reveal className={styles.stackItem}>
             <p className="eyebrow">{s.kicker}</p>
             <h2 className={`display ${styles.title}`}>{s.title}</h2>
@@ -161,6 +253,8 @@ export function BottleFeature({ expression = expressionById("private-edition-i")
           </div>
         ))}
       </Reveal>
+        {children && <div data-gallery className={styles.gallery}>{children}</div>}
+      </div>
     </section>
   );
 }

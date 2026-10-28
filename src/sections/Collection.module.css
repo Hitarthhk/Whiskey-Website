@@ -1,8 +1,23 @@
 .section {
   --accent: #0f3326;
   position: relative;
-  background: radial-gradient(120% 90% at 70% 50%, var(--accent), var(--forest-950) 75%);
+  background: #11171d;
 }
+.section[data-embedded="true"] { background: transparent; min-height: 100svh; }
+/* Flow/reduced layouts have no showcase progress. Their final readable state
+   must also survive a responsive change while LazyMotion is loading. */
+.section[data-embedded="false"] [data-alpine-gallery],
+.section[data-embedded="false"] [data-collection-details],
+.section[data-embedded="false"] [data-collection-controls],
+.section[data-embedded="false"] [data-card-item] > div,
+.section[data-embedded="false"] .copy,
+.section[data-embedded="false"] .cardMeta { opacity: 1 !important; transform: none !important; }
+.copy,
+.selection { display: grid; gap: 22px; }
+.models { opacity: 0; }
+.modelsReady { opacity: 1; transition: opacity 0.25s; }
+.tilt { transition: opacity 0.25s; }
+.section[data-embedded="true"] .card:hover { transform: none; }
 .stage {
   position: relative;
   min-height: 100vh;
@@ -13,16 +28,6 @@
   grid-template-columns: minmax(340px, 34vw) minmax(0, 1fr);
   align-items: stretch;
 }
-.glow {
-  position: absolute;
-  right: 18%;
-  top: 50%;
-  width: 80vh;
-  height: 80vh;
-  margin-top: -40vh;
-  pointer-events: none;
-  transition: background 1.2s var(--ease-rise);
-}
 .details {
   position: relative;
   z-index: 3;
@@ -30,7 +35,7 @@
   display: grid;
   gap: 22px;
   align-content: center;
-  background: linear-gradient(90deg, rgba(7, 16, 12, 0.92) 70%, transparent);
+  background: linear-gradient(90deg, rgba(12, 17, 23, 0.92) 70%, transparent);
 }
 .name {
   font-size: clamp(40px, 3.8vw, 72px);
@@ -127,19 +132,25 @@
   background: linear-gradient(180deg, rgba(201, 164, 92, 0.12), rgba(201, 164, 92, 0));
 }
 .cardStage {
+  position: relative;
   display: grid;
   place-items: center;
   perspective: 900px;
   min-height: 0;
 }
 .tilt {
+  position: absolute;
+  inset: 0;
   display: grid;
+  grid-template-rows: minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   place-items: center;
   height: 100%;
   width: 100%;
   transform-style: preserve-3d;
 }
 .cardBottle {
+  min-height: 0;
   height: 100%;
   max-height: 52vh;
   width: auto;
@@ -158,7 +169,7 @@
   font-size: 11px;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--ivory-45);
+  color: rgba(239, 233, 220, 0.72);
 }
 
 /* ---------- Simple: stacked, pair above the details ---------- */
@@ -188,3 +199,27 @@
 .section[data-mode="simple"] .cardSub {
   letter-spacing: 0.14em;
 }
+.section[data-linked="true"][data-mode="simple"] .stage { padding-top: 40px; }
+@media (min-width: 900px) and (max-width: 1199px) {
+  .details { padding: calc(var(--nav-h) + 12px) 26px 24px; gap: 16px; }
+  .selection, .copy { gap: 16px; }
+  .name { font-size: 36px; }
+  .notes div { grid-template-columns: 60px 1fr; gap: 12px; }
+  .ctas { gap: 8px; }
+  .ctas a { padding-inline: 22px; height: 48px; }
+}
+@media (min-width: 900px) and (max-height: 740px) {
+  .section[data-embedded="true"] .details { gap: 14px; padding-top: calc(var(--nav-h) + 12px); padding-bottom: 24px; }
+  .section[data-embedded="true"] .copy,
+  .section[data-embedded="true"] .selection { gap: 14px; }
+  .section[data-embedded="true"] .name { font-size: clamp(32px, 3.3vw, 48px); }
+  .section[data-embedded="true"] .notes { gap: 8px; }
+  .section[data-embedded="true"] .notes div { padding-bottom: 8px; }
+  .section[data-embedded="true"] .ctas a { height: 44px; padding-inline: 22px; }
+}
+
+.photoPose { display: grid; place-items: center; height: 100%; min-height: 0; width: 100%; }
+.selectionMark { height: 1px; width: 28px; background: var(--gold-bright); transform-origin: left; position: absolute; bottom: -10px; left: 0; }
+.cardMeta { position: relative; isolation: isolate; }
+.cardMeta::before { content: ""; position: absolute; z-index: -1; inset: -24px -24px -24px; background: linear-gradient(180deg, transparent, rgba(8, 10, 13, 0.8)); pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { .card:hover { transform: none; } }

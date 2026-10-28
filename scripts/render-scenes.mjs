@@ -17,8 +17,6 @@ const browser = await chromium.launch({ channel: "chrome", args: ["--use-angle=d
 try {
   for (const [name, s] of Object.entries(SETS)) {
     const page = await browser.newPage({ viewport: { width: 800, height: 600 } });
-    // Skip the age gate (and its own scene) on this tooling page.
-    await page.addInitScript(() => sessionStorage.setItem("gv-age-verified", "1"));
     await page.goto(`${base}/dev/scenes?w=${s.w}&h=${s.h}&hw=${s.hw}&hh=${s.hh}`);
     await page.waitForFunction(() => document.getElementById("scene-status")?.textContent !== "rendering", null, { timeout: 600_000 });
     const status = await page.textContent("#scene-status");

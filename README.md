@@ -10,6 +10,8 @@ npm run dev        # http://localhost:3000
 npm run build && npm start
 npm run typecheck  # needs generated route types: run dev or build once first
 npm test           # starts a temporary production server; run build first
+npm run test:transition # isolated Motion timeline previews in local Chrome; run build first
+npm run test:handoff # real scroll-engine/reference-image previews; run build first
 node scripts/bake-assets.mjs   # regenerate emblem, fallbacks and label textures
 node scripts/render-scenes.mjs # re-render the Himalayan scenes (needs `npm run dev` running and Chrome)
 ```
@@ -18,8 +20,8 @@ node scripts/render-scenes.mjs # re-render the Himalayan scenes (needs `npm run 
 
 | Route | Contents |
 | --- | --- |
-| `/` | Hero → Our Origin → Bottle Collection → Individual Bottle Showcase (Private Edition I) → Contact |
-| `/story` | Our Story: four chapters (Solan, the monal, the rhododendron, the attitude) and the Philosophy section with the emblem |
+| `/` | Hero → Bottle Showcase (Private Edition I) → Collection → Our Origin → Contact, one continuous film |
+| `/story` | Our Story: one continuous film in five chapters (The Valley, The Beginning, The Landscape, The Emblem with an interactive emblem explorer, The Philosophy), closing on *Some places cannot be hurried.* Imagery credits and editorial review items: `docs/assets/our-story.md` |
 | `/craft` | Our Craft: copper, barley and oak scenes with liquid-edge wipes and hotspots |
 | `/whisky` | Our Whisky: the collection, then a dedicated 3D showcase for each expression |
 | `/contact` | Contact: company and origin, enquiry form |
@@ -40,6 +42,16 @@ All copy and product data live in `src/content/site.ts`. Facts come from the bra
 | Contact | `sections/Contact.tsx` | Closing landscape; compact invitation, or the form on `/contact` | Same, single column |
 
 Scenes are authored with `useScene` (`src/animation`), which scopes, reverts and re-sorts pins into DOM order. Reveals that may be built while their layout is still hidden use `fromTo` with an explicit visible end state.
+
+## The homepage's second half
+
+From the collection to the footer, the homepage plays as one film (`src/components/transition/originJourney.ts`). On desktop, Our Origin's single pin carries three segments: a 50% **bridge** laid over the collection's settled hold, where the interface recedes, valley mist rises and the Foothills open out of the selected whisky world; the chapters' existing **300%**; and a 70% **closing**, where The Philosophy dissolves into Contact's twilight backdrop, which sits beneath it. Inside Origin, a near pine bough passes the lens between The Foothills and The Emblem, and the forest dims around the emblem and warms to amber before the copper scene is revealed. Contact's light then fades into the footer with no dividing line. Phones and reduced motion keep native scroll, with soft feathers at each section edge.
+
+Contact's twilight plate is currently an **interim** (the age-gate photograph, mirrored). The replacement brief and prompt are in `docs/assets/contact-twilight.md`. `/whisky` and `/contact` keep the original Contact section.
+
+## Page transitions
+
+Internal links (`TransitionLink`) play **the pour** (`components/transition/TransitionProvider.tsx`, shader in `three/pour.ts`). Whisky-amber liquid spreads from the point that was clicked, with a lit meniscus at its edge. The emblem and the destination's name surface in it while the route changes, then the level drains away to reveal the new page. One WebGL canvas is created during idle time and reused, and it renders only while a transition runs, on its own capped clock so a heavy first render never makes it jump. Without WebGL the same shapes are drawn in CSS; reduced motion gets a short amber fade. Back/forward, new-tab, hash and external links stay native, and an 8-second watchdog recovers an abandoned navigation.
 
 ## 3D bottles (`src/three`)
 
@@ -78,6 +90,6 @@ The enquiry form validates locally. It sends nothing unless `NEXT_PUBLIC_ENQUIRY
 
 Concept-stage notes, not legal advice. Confirm with counsel for every market.
 
-- **Age gate:** first visit; “remember me” is opt-in (otherwise session-only). Consider a date-of-birth and location gate if counsel requires it.
+- **Age gate:** asks on every page reload; confirmation is kept in memory only. Consider a date-of-birth and location gate if counsel requires it.
 - **India:** direct and surrogate liquor advertising is restricted (Cable TV Networks Rules, ASCI code, CCPA guidelines), and some states prohibit alcohol. The site avoids price, purchase or “buy now” CTAs, health or performance claims, and any appeal to minors.
 - **Responsibility messaging** appears in the gate, the footer and the menu.

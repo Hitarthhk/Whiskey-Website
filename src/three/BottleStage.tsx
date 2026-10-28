@@ -6,8 +6,11 @@ import { useEffect, useRef, useState, type RefObject } from "react";
 import type { Expression } from "@/content/site";
 import { Bottle, CAMERA, type Quality } from "./Bottle";
 import { designs } from "./bottles/designs";
+import { WhiskyLighting } from "./WhiskyLighting";
 import { useDragRotate } from "./useDragRotate";
+import { ContextLossGuard } from "./ContextLossGuard";
 import { TransmissionBackdrop } from "./useTransmissionBackdrop";
+import type { GalleryTarget } from "@/components/transition/HeroBottleHandoff";
 
 type Props = {
   expression: Expression;
@@ -18,6 +21,10 @@ type Props = {
   mode: "scroll" | "static";
   idle: boolean;
   className?: string;
+  /** Report only after the loaded model has rendered in its current pose. */
+  onReady?: () => void;
+  onUnavailable?: () => void;
+  gallery?: GalleryTarget;
 };
 
 /**
@@ -26,7 +33,7 @@ type Props = {
  * lighting from procedural light-formers tinted to the expression (no HDR
  * download). Dragging the stage turns the bottle.
  */
-export default function BottleStage({ expression, backdrop, progress, quality, mode, idle, className }: Props) {
+export default function BottleStage({ expression, backdrop, progress, quality, mode, idle, className, onReady, onUnavailable, gallery }: Props) {
   const host = useRef<HTMLDivElement>(null);
   const [near, setNear] = useState(false);
   const [visible, setVisible] = useState(false);
@@ -55,11 +62,9 @@ export default function BottleStage({ expression, backdrop, progress, quality, m
           aria-hidden="true"
         >
           <TransmissionBackdrop color={backdrop} />
-          <ambientLight intensity={0.18} />
-          <spotLight position={[-4, 5, 3]} angle={0.4} penumbra={1} intensity={60} color={light.key} />
-          <spotLight position={[4, 2, -3]} angle={0.5} penumbra={1} intensity={55} color={light.rim} />
-          <pointLight position={[3, -1, 2]} intensity={4} color={light.fill} distance={8} />
-          <Bottle expression={expression} progress={progress} quality={quality} mode={mode} idle={idle} drag={drag} />
+          {onUnavailable && <ContextLossGuard onUnavailable={onUnavailable} />}
+          <WhiskyLighting expression={expression} gallery={gallery} progress={progress} reduced={!idle} />
+          <Bottle expression={expression} progress={progress} quality={quality} mode={mode} idle={idle} drag={drag} onReady={onReady} gallery={gallery} />
           <Environment resolution={256} frames={1}>
             {/* Thin strip lights: crisp streak reflections on flat glass, as in product photography. */}
             <Lightformer form="rect" intensity={5} color="#fff1d6" position={[-3.2, 1, 3]} scale={[0.22, 7, 1]} target={[0, 0, 0]} />

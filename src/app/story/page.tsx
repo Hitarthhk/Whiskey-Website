@@ -1,19 +1,15 @@
 import type { Metadata } from "next";
-import { dusk } from "@/components/landscape/palettes";
-import { Closing } from "@/sections/Closing";
-import { PageIntro } from "@/sections/PageIntro";
-import { Philosophy } from "@/sections/Philosophy";
-import { Story } from "@/sections/Story";
+import { preload } from "react-dom";
+import { storyPhotos } from "@/content/site";
+import { OurStory } from "@/sections/story/OurStory";
 
-export const metadata: Metadata = { title: "Our Story — Gamber Valley" };
+export const metadata: Metadata = {
+  title: "Our Story — Gamber Valley",
+  description: "From the Shivalik foothills of Solan to the emblem and the philosophy of Gamber Valley Indian Single Malt Whisky.",
+};
 
+/** Our Story: one continuous film in five chapters. */
 export default function StoryPage() {
-  return (
-    <>
-      <PageIntro eyebrow="Our Story" title="Rooted in Solan" palette={dusk} id="story-intro" />
-      <Story />
-      <Philosophy />
-      <Closing />
-    </>
-  );
+  preload(storyPhotos.opening.src, { as: "image", fetchPriority: "high" });
+  return <OurStory />;
 }

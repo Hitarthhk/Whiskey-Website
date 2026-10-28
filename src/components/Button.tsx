@@ -26,9 +26,16 @@ export function Button({ children, href, onClick, variant = "outline", cursor }:
     </span>
   );
   const cls = `${styles.btn} ${styles[variant]}`;
+  // Other sites open in a new tab; mailto: and the like hand off to the system.
+  const external = href !== undefined && !href.startsWith("/");
   return (
     <Magnetic>
-      {href ? (
+      {external ? (
+        <a href={href} className={cls} data-cursor={cursor}
+          {...(/^https?:/.test(href) ? { target: "_blank", rel: "noopener noreferrer" } : {})}>
+          {inner}
+        </a>
+      ) : href ? (
         <TransitionLink href={href} className={cls} data-cursor={cursor}>
           {inner}
         </TransitionLink>

@@ -8,3 +8,4 @@ export { Reveal } from "./Reveal";
 export { Parallax } from "./Parallax";
 export { Magnetic } from "./Magnetic";
 export { liquidClip } from "./liquid";
+export { MotionUIProvider, MOTION_EASE, m, AnimatePresence, useReducedMotion } from "./MotionUI";
