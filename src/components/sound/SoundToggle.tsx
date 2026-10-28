@@ -9,8 +9,22 @@ const KEY = "gv-sound";
 let engine: Soundscape | null = null;
 const getEngine = () => (engine ??= new Soundscape());
 
-const read = () => { try { return localStorage.getItem(KEY) === "on"; } catch { return false; } };
+const stored = () => { try { return localStorage.getItem(KEY); } catch { return null; } };
+const read = () => stored() === "on";
 const write = (on: boolean) => { try { localStorage.setItem(KEY, on ? "on" : "off"); } catch { /* private mode */ } };
+
+const started = new Set<() => void>();
+/**
+ * Entering the valley starts its sound: the age gate calls this from its
+ * "Yes" click, the gesture browsers require to unlock audio. A visitor who
+ * has turned the sound off before keeps that choice.
+ */
+export function enterWithSound() {
+  if (stored() === "off" || engine?.playing) return;
+  getEngine().start();
+  write(true);
+  started.forEach((notify) => notify());
+}
 
 /** Sections declare their atmosphere with data-soundscape; the one crossing
  * the middle of the viewport sets the scene (the last in document order wins,
@@ -26,9 +40,10 @@ function currentScene(): Scene {
 }
 
 /**
- * "The Sound of the Valley" control. Muted by default; sound only ever begins
- * from an explicit interaction. A visitor who left it on finds it resuming at
- * their first tap or key press (browsers forbid audible autoplay).
+ * "The Sound of the Valley" control. Sound only ever begins from an explicit
+ * interaction: confirming the age gate, or this toggle. A visitor who left it
+ * on finds it resuming at their first tap or key press (browsers forbid
+ * audible autoplay).
  */
 export function SoundToggle() {
   const [on, setOn] = useState(false);
@@ -56,6 +71,13 @@ export function SoundToggle() {
     const remove = () => events.forEach((e) => window.removeEventListener(e, begin, true));
     events.forEach((e) => window.addEventListener(e, begin, true));
     return remove;
+  }, []);
+
+  // Started from the age gate: mirror it on the control.
+  useEffect(() => {
+    const notify = () => { setOn(true); setWaiting(false); };
+    started.add(notify);
+    return () => { started.delete(notify); };
   }, []);
 
   // Follow the page while sound plays: scroll, layout changes and new routes.

@@ -55,7 +55,7 @@ Internal links (`TransitionLink`) play **the pour** (`components/transition/Tran
 
 ## The Sound of the Valley
 
-An ambient soundscape (`components/sound/`), muted by default, with a small toggle in the bottom-right corner. Licensed field recordings (wind, pines, Himalayan foothill birds) and two quiet synthesized layers crossfade as the visitor scrolls: each section declares its mood with `data-soundscape` (`hero`, `showcase`, `collection`, `forest`, `breeze`). It starts only from an explicit interaction, remembers the preference, continues across pages and pauses in hidden tabs. The current recordings are labelled stand-ins, none from Solan; the asset manifest, credits and the recordings to commission are in `docs/assets/soundscape.md`.
+An ambient soundscape (`components/sound/`) that begins when the visitor confirms the age gate (unless they have turned it off before), with a small toggle in the bottom-right corner. Licensed field recordings (wind, pines, Himalayan foothill birds) and two quiet synthesized layers crossfade as the visitor scrolls: each section declares its mood with `data-soundscape` (`hero`, `showcase`, `collection`, `forest`, `breeze`). It starts only from an explicit interaction (the gate's "Yes" or the toggle), remembers the preference, continues across pages and pauses in hidden tabs. The current recordings are labelled stand-ins, none from Solan; the asset manifest, credits and the recordings to commission are in `docs/assets/soundscape.md`.
 
 ## 3D bottles (`src/three`)
 

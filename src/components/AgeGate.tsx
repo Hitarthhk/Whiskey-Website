@@ -6,6 +6,7 @@ import { useScrollLock } from "./useScrollLock";
 import { brand, informationPages } from "@/content/site";
 import { Emblem } from "./Emblem";
 import { HimalayanCameraDive } from "./transition/HimalayanCameraDive";
+import { enterWithSound } from "./sound/SoundToggle";
 import styles from "./AgeGate.module.css";
 
 type Status = "pending" | "denied" | "exiting" | "entered";
@@ -63,6 +64,8 @@ export function AgeGate({ children }: { children: ReactNode }) {
   const confirm = () => {
     if (confirming.current) return;
     confirming.current = true;
+    enterWithSound(); // inside the click: required to unlock audio
+
     setStatus("exiting");
   };
 
