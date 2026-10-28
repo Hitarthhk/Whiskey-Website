@@ -97,13 +97,12 @@ try {
       const progress = Motion.motionValue(0);
       window.previewProgress = progress;
       const map = definition => Motion.mapValue(progress, definition.input, definition.output);
-      const { HERO_COPY, HERO_DESCRIPTION, HANDOFF_CUE, BOTTLE_NOTE, VALLEY } = window.handoffMappings;
+      const { HERO_COPY, HERO_DESCRIPTION, HANDOFF_CUE, VALLEY } = window.handoffMappings;
       const style = (selector, properties) => Motion.styleEffect(document.querySelector(selector), properties);
       if (!profile.reduced) {
         style("[data-copy]", { opacity: Motion.mapValue(progress, HERO_COPY.input, HERO_COPY.opacity), transform: Motion.mapValue(progress, HERO_COPY.input, HERO_COPY.y.map(y => `translateY(${y})`)) });
         style("[data-hero-description]", { opacity: map(HERO_DESCRIPTION) });
         style("[data-cue]", { opacity: map(HANDOFF_CUE) });
-        style("[data-bottle-note]", { opacity: map(BOTTLE_NOTE) });
         style("[data-valley-scene]", { opacity: map(VALLEY.reveal) });
         style("[data-valley-shade]", { opacity: map(VALLEY.darkness) });
         style("[data-valley-amber]", { opacity: map(VALLEY.warmth) });
@@ -170,7 +169,6 @@ try {
           copyGap: introBox.left - rect.right,
           photoMounted: flat === window.previewBottlePhoto,
           valleySource: document.querySelector("[data-valley-scene] img").getAttribute("src"),
-          note: Number(getComputedStyle(document.querySelector("[data-bottle-note]")).opacity),
           overflow: document.documentElement.scrollWidth > innerWidth + 1,
         };
       }, { p, cinematic });
@@ -179,7 +177,6 @@ try {
       assert.equal(result.valleySource, "/media/photography/bottle-valley-golden-depths.webp", "Showcase reuses the hero panorama");
       if (!profile.reduced && result.copy > 0.05 && result.copy < 0.99 && result.visible) overlap = true;
       if (cinematic && p >= 0.01 && p <= 0.12) assert.equal(result.visible, true, `Empty handoff at p=${p}: ${JSON.stringify(result)}`);
-      if (cinematic && p === 0) assert.ok(result.note < 0.01, `Bottle rendering note intrudes on the initial hero: ${JSON.stringify(result)}`);
       if (cinematic && p < 0.28) assert.ok(result.introOpacity < 0.01, "Product introduction precedes the settled bottle");
       if (cinematic && p === 0.36) {
         assert.ok(result.introOpacity > 0.99, "Product introduction is missing after the bottle settles");

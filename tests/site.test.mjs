@@ -80,7 +80,7 @@ test("homepage Origin remains separate from the dedicated Our Story page", async
     assert.ok(home.includes(`/media/photography/origin-${scene}.webp`));
     assert.ok(!story.includes(`/media/photography/origin-${scene}.webp`));
   }
-  assert.match(home, /Conceptual scenery/);
+  assert.doesNotMatch(home, /Conceptual scenery|3D rendering from reference photography/, "removed labels are back");
   assert.match(story, /id="story-title"/);
 });
 

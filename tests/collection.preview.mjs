@@ -98,7 +98,7 @@ async function verifyOrigin(page,profile){
  const root=page.locator('[data-origin]');
  assert.equal(await root.locator('canvas').count(),0,'Origin created an unnecessary WebGL canvas');
  assert.equal(await root.locator('[data-origin-tick]').count(),3);
- assert.match(await root.innerText(),/Conceptual scenery/);
+ assert.doesNotMatch(await root.innerText(),/Conceptual scenery/);
  const setup=await page.evaluate(()=>{const el=document.querySelector('[data-origin]');const t=window.__ST.getAll().find(t=>t.trigger===el&&t.vars.pin);return t?{start:t.start,end:t.end}:null});
  // One pin: 50% bridge from the collection, the chapters' 300%, a 70% closing into Contact (originJourney.ts).
  if(cinematic)assert.ok(Math.abs(setup.end-setup.start-innerHeightFor(profile)*(JOURNEY.bridge+JOURNEY.chapters+JOURNEY.closing))<2,'Origin pin changed from bridge + 300% + closing');

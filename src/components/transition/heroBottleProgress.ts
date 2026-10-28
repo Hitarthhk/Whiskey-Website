@@ -6,7 +6,6 @@ export const HERO_COPY = {
 };
 export const HERO_DESCRIPTION = { input: [0, 0.065], output: [1, 0] };
 export const HANDOFF_CUE = { input: [0, 0.015], output: [1, 0] };
-export const BOTTLE_NOTE = { input: [0, 0.06, 0.12], output: [0, 0, 1] };
 export const VALLEY = {
   reveal: { input: [0, 0.06, 0.28], output: [0, 0.22, 1] },
   darkness: { input: [0, 0.1, 0.3], output: [0.05, 0.23, 0.34] },

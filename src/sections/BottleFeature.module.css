@@ -99,13 +99,6 @@
   width: auto;
   filter: drop-shadow(0 40px 60px rgba(0, 0, 0, 0.5));
 }
-.placeholder {
-  position: absolute;
-  bottom: 28px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 4;
-}
 .step {
   position: absolute;
   z-index: 4;

@@ -26,7 +26,7 @@ export function Origin() {
   const second = useMotionThreshold(progress, 1 / 3);
   const third = useMotionThreshold(progress, 2 / 3);
   const current = third ? 3 : second ? 2 : 1;
-  // Label, ticks and provenance arrive with the valley and leave before Contact.
+  // Label and ticks arrive with the valley and leave before Contact.
   const chrome = useTransform([bridge, closing], ([b, c]: number[]) => Math.min(ramp(b, BRIDGE.chrome.input), 1 - ramp(c, CLOSING.chrome.input)));
   const copy = useTransform(closing, CLOSING.copy.input, CLOSING.copy.output);
   const scenery = useTransform(closing, CLOSING.craft.input, CLOSING.craft.output);
@@ -143,7 +143,6 @@ export function Origin() {
             </li>
           ))}
         </m.ol>
-        <m.p className={styles.provenance} style={{ opacity: chrome }}>Conceptual scenery &amp; craftsmanship</m.p>
       </div>
       <m.div className={styles.chapters} style={{ opacity: copy }}>
         {origin.chapters.map(chapter => (

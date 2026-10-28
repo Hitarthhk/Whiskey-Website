@@ -7,7 +7,7 @@ import { EASE, gsap, Reveal, SplitText, useMotion, useScene } from "@/animation"
 import { useMotionThreshold } from "@/animation/useMotionThreshold";
 import { ProductImage } from "@/components/ProductImage";
 import { WebGLBoundary } from "@/components/WebGLBoundary";
-import { ClaimText, PendingTag } from "@/components/Pending";
+import { ClaimText } from "@/components/Pending";
 import { bottleIntroduction, expressionById, type Expression } from "@/content/site";
 import { useQuality } from "@/three/useQuality";
 import styles from "./BottleFeature.module.css";
@@ -15,7 +15,6 @@ import { m, useMotionValue, useTransform } from "motion/react";
 import { useHeroBottleHandoff } from "@/components/transition/HeroBottleHandoff";
 import { BottleValley, VALLEY_BACKDROP } from "@/components/landscape/BottleValley";
 import { GALLERY, GALLERY_MOVE, COLLECTION_HOLD } from "@/components/transition/bottleCollectionProgress";
-import { BOTTLE_NOTE } from "@/components/transition/heroBottleProgress";
 
 const BottleStage = dynamic(() => import("@/three/BottleStage"), { ssr: false });
 
@@ -37,7 +36,6 @@ export function BottleFeature({ expression = expressionById("private-edition-i")
   const rising = useMotionThreshold(sceneProgress, 0.06);
   const valleyOpacity = useTransform(sceneProgress, GALLERY.environment.input, [1, 0.65, 0]);
   const pointer = useTransform(sceneProgress, value => value >= 0.91 ? "none" : "auto");
-  const noteOpacity = useTransform(sceneProgress, gallery ? [...BOTTLE_NOTE.input, 0.86, 0.93] : BOTTLE_NOTE.input, gallery ? [...BOTTLE_NOTE.output, 1, 0] : BOTTLE_NOTE.output);
   const { ready, reduced, mobile, webgl } = useMotion();
   const [gpuFailed, setGpuFailed] = useState(false);
   const failGPU = useCallback(() => setGpuFailed(true), []);
@@ -225,9 +223,6 @@ export function BottleFeature({ expression = expressionById("private-edition-i")
               <ProductImage expression={expression} className={styles.svg} />
             </div>
           )}
-          <m.span data-bottle-note className={styles.placeholder} style={{ opacity: handoff && !reduced ? noteOpacity : 1 }}>
-            <PendingTag>{use3D ? "3D rendering from reference photography · drag to turn" : "Reference photography"}</PendingTag>
-          </m.span>
         </div>
 
         <div data-step className={`${styles.step} ${styles.right}`}>
