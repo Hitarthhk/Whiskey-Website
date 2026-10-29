@@ -132,8 +132,8 @@ try {
     const cinematic = profile.width >= 900 && !profile.reduced;
     if (cinematic) {
       assert.ok(Math.abs(setup.pinStart) < 2, `Bottle entrance still waits until ${setup.pinStart}px`);
-      // 320vh showcase + COLLECTION_HOLD (100vh: settled collection, then Our Origin's bridge).
-      assert.ok(Math.abs(setup.pinLength - profile.height * 4.2) < 2, "Collection hold did not extend the existing pin");
+      // 320vh showcase + COLLECTION_HOLD (60vh: settled collection, then Our Origin's bridge).
+      assert.ok(Math.abs(setup.pinLength - profile.height * 3.8) < 2, "Collection hold did not extend the existing pin");
       // A gentle forward scroll, followed below by larger jumps and reversal.
       await page.evaluate(async () => {
         for (let step = 0; step <= 10; step++) {

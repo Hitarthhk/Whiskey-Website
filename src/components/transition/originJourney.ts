@@ -10,7 +10,7 @@
  *    landscape, which Contact holds beneath as a sticky backdrop.
  * The 100vh slide-ins this replaces made the page longer than it is now. */
 export const ORIGIN_SCROLL = {
-  bridge: 50,
+  bridge: 40,
   chapters: 300,
   closing: 70,
 } as const;

@@ -5,7 +5,7 @@
 .section[data-mode="cinematic"] {
   z-index: 3;
   background: transparent;
-  margin-top: calc(-100vh - var(--origin-bridge, 50vh));
+  margin-top: calc(-100vh - var(--origin-bridge, 40vh));
   pointer-events: none;
 }
 /* It holds clicks only between covering the collection and dissolving into Contact. */

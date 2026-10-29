@@ -12,10 +12,10 @@ export const GALLERY = {
 // collection view, rather than a moving target for a damped Three.js bottle.
 export const GALLERY_MOVE = { start: 0.86, end: 0.965 };
 /** Keep the completed collection on screen before releasing to Our Origin.
- * Extend the same timeline by 100vh while preserving the original 320vh
- * choreography's absolute scroll positions: half a screen of settled,
- * interactive collection, then Our Origin's 50vh bridge over its last part. */
-export const COLLECTION_HOLD = { scrollPercent: 100, timelineEnd: 1 + 100 / 320 };
+ * Extend the same timeline by 60vh while preserving the original 320vh
+ * choreography's absolute scroll positions: a short pause on the settled,
+ * interactive collection, then Our Origin's 40vh bridge over its last part. */
+export const COLLECTION_HOLD = { scrollPercent: 60, timelineEnd: 1 + 60 / 320 };
 export const galleryMix = (p: number) => {
   const t = Math.min(1, Math.max(0, (p - GALLERY_MOVE.start) / (GALLERY_MOVE.end - GALLERY_MOVE.start)));
   return t * t * (3 - 2 * t);

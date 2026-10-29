@@ -100,7 +100,7 @@ async function verifyOrigin(page,profile){
  assert.equal(await root.locator('[data-origin-tick]').count(),3);
  assert.doesNotMatch(await root.innerText(),/Conceptual scenery/);
  const setup=await page.evaluate(()=>{const el=document.querySelector('[data-origin]');const t=window.__ST.getAll().find(t=>t.trigger===el&&t.vars.pin);return t?{start:t.start,end:t.end}:null});
- // One pin: 50% bridge from the collection, the chapters' 300%, a 70% closing into Contact (originJourney.ts).
+ // One pin: 40% bridge from the collection, the chapters' 300%, a 70% closing into Contact (originJourney.ts).
  if(cinematic)assert.ok(Math.abs(setup.end-setup.start-innerHeightFor(profile)*(JOURNEY.bridge+JOURNEY.chapters+JOURNEY.closing))<2,'Origin pin changed from bridge + 300% + closing');
  else assert.equal(setup,null,'Mobile/reduced Origin should use native scroll');
  const previous=new Map();
@@ -148,7 +148,7 @@ async function verifyOrigin(page,profile){
 }
 function innerHeightFor(profile){return profile.height;}
 /** Viewport heights of Origin's single pin (src/components/transition/originJourney.ts). */
-const JOURNEY={bridge:.5,chapters:3,closing:.7};
+const JOURNEY={bridge:.4,chapters:3,closing:.7};
 let browser;
 try {
  browser=await chromium.launch({channel:'chrome',headless:true});
