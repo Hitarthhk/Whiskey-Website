@@ -155,14 +155,14 @@ function TwilightContact({ title }: { title: string }) {
           <picture>
             <source media="(max-width: 899px)" srcSet={TWILIGHT.mobile} />
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={TWILIGHT.src} alt="" width={TWILIGHT.width} height={TWILIGHT.height} loading="lazy" decoding="async" draggable={false}
+            <img src={TWILIGHT.src} alt="" width={TWILIGHT.width} height={TWILIGHT.height} loading="lazy" decoding="sync" draggable={false}
               className={styles.plateImage} data-mirrored={TWILIGHT.mirrored} />
           </picture>
         </m.div>
         <m.div className={styles.horizon} style={{ opacity: horizon }}><span /></m.div>
         <m.div className={styles.mistBand} style={{ opacity: mist }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/media/photography/mist-a.webp" alt="" loading="lazy" decoding="async" />
+          <img src="/media/photography/mist-a.webp" alt="" loading="lazy" decoding="sync" />
         </m.div>
         <div className={styles.scrimTwilight} />
         <m.div className={styles.copper} style={{ opacity: copper }} />

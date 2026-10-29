@@ -41,20 +41,20 @@ export function HeroPhoto({ className }: { className?: string }) {
       <div className={styles.layer} data-layer data-depth={0.3}>
         <div data-layer-inner className={styles.inner}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={HERO_PHOTO} alt="" width={1172} height={660} decoding="async" fetchPriority="high" className={styles.photo} />
+          <img src={HERO_PHOTO} alt="" width={1172} height={660} decoding="sync" fetchPriority="high" className={styles.photo} />
         </div>
       </div>
       {/* Valley mist over the cloud sea, warmed to the evening light. */}
       <div className={`${styles.fog} ${styles.fogHigh}`} data-fog data-depth={0.3}>
         <span data-fog-drift className={styles.fogBand}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={MIST[0]} alt="" decoding="async" className={styles.mist} />
+          <img src={MIST[0]} alt="" decoding="sync" className={styles.mist} />
         </span>
       </div>
       <div className={`${styles.fog} ${styles.fogLow}`} data-fog data-depth={0.6}>
         <span data-fog-drift className={styles.fogBand}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={MIST[1]} alt="" decoding="async" className={styles.mist} />
+          <img src={MIST[1]} alt="" decoding="sync" className={styles.mist} />
         </span>
       </div>
       <div className={styles.sun} data-sun />

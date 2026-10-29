@@ -58,15 +58,15 @@ export function HimalayanCameraDive({ active, page, gate, panel, onComplete }: P
     <div ref={scene} className={styles.scene} data-active={active} aria-hidden="true">
       <div data-dive-night className={styles.night}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={AGE_GATE_BACKGROUND} alt="" decoding="async" fetchPriority="high" />
+        <img src={AGE_GATE_BACKGROUND} alt="" decoding="sync" fetchPriority="high" />
       </div>
       <div data-dive-fog-far className={`${styles.fog} ${styles.far}`}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={MIST[0]} alt="" decoding="async" />
+        <img src={MIST[0]} alt="" decoding="sync" />
       </div>
       <div data-dive-fog-near className={`${styles.fog} ${styles.near}`}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={MIST[1]} alt="" decoding="async" />
+        <img src={MIST[1]} alt="" decoding="sync" />
       </div>
       <div data-dive-sunlight className={styles.sunlight} />
       <div data-dive-light className={styles.light} />

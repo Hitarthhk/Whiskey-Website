@@ -102,15 +102,15 @@ export function OriginEnvironment({ progress, bridge, closing, reduced }: Props)
         ))}
         <m.div className={styles.farMist} style={{ opacity: farMistOpacity, x: still(farMistX) }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={MIST[0]} alt="" loading="lazy" decoding="async" />
+          <img src={MIST[0]} alt="" loading="lazy" decoding="sync" />
         </m.div>
         <m.div className={styles.mist} style={{ opacity: mistOpacity, x: still(mistX) }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={MIST[1]} alt="" loading="lazy" decoding="async" />
+          <img src={MIST[1]} alt="" loading="lazy" decoding="sync" />
         </m.div>
         <m.div className={styles.foliage} style={{ opacity: foliageOpacity, x: still(foliageX), y: still(foliageY), scale: still(foliageScale) }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={ORIGIN_FOREGROUND} alt="" loading="lazy" decoding="async" draggable={false} />
+          <img src={ORIGIN_FOREGROUND} alt="" loading="lazy" decoding="sync" draggable={false} />
         </m.div>
         <div className={styles.scrim} />
         <m.div className={styles.warmth} style={{ opacity: warmth }} />
@@ -118,22 +118,22 @@ export function OriginEnvironment({ progress, bridge, closing, reduced }: Props)
         <m.div data-origin-emblem className={styles.emblem} style={{ opacity: emblemOpacity, scale: still(emblemScale), y: still(emblemY) }}>
           {/* The supplied original artwork is never regenerated or stretched. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={brand.emblem.src} alt="" width={brand.emblem.width} height={brand.emblem.height} loading="lazy" decoding="async" draggable={false} />
+          <img src={brand.emblem.src} alt="" width={brand.emblem.width} height={brand.emblem.height} loading="lazy" decoding="sync" draggable={false} />
         </m.div>
         {/* With reduced motion the plates simply crossfade; nothing passes the lens. */}
         {!reduced && (
           <m.div className={styles.canopy} style={{ opacity: canopyOpacity, x: canopyX, y: canopyY }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={ORIGIN_FOREGROUND} alt="" loading="lazy" decoding="async" draggable={false} />
+            <img src={ORIGIN_FOREGROUND} alt="" loading="lazy" decoding="sync" draggable={false} />
           </m.div>
         )}
       </m.div>
       <m.div className={styles.bridgeSun} style={{ opacity: sun }} />
       <m.div className={styles.bridgeMist} style={{ opacity: bridgeMist, y: still(bridgeMistY) }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={MIST[0]} alt="" loading="lazy" decoding="async" />
+        <img src={MIST[0]} alt="" loading="lazy" decoding="sync" />
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={MIST[1]} alt="" loading="lazy" decoding="async" />
+        <img src={MIST[1]} alt="" loading="lazy" decoding="sync" />
       </m.div>
     </div>
   );
@@ -171,7 +171,7 @@ function Scene({ scene, index, progress, push, reduced, children }: SceneProps) 
         <picture>
           <source media="(max-width: 899px)" srcSet={scene.mobile} />
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={scene.src} alt="" width={1672} height={941} loading="lazy" decoding="async" draggable={false} className={styles.photo} />
+          <img src={scene.src} alt="" width={1672} height={941} loading="lazy" decoding="sync" draggable={false} className={styles.photo} />
         </picture>
       </m.div>
       {children}

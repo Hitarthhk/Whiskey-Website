@@ -31,13 +31,13 @@ export function BottleValley({ progress, linked, reduced, gallery = false }: {
       <m.div data-valley-scene className={styles.landscape} style={{ opacity: linked && !reduced ? reveal : 1 }}>
         {/* Environment only; the original bottle remains a separate asset. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={VALLEY_PHOTO} alt="" width={1672} height={941} decoding="async" className={styles.photo} />
+        <img src={VALLEY_PHOTO} alt="" width={1672} height={941} decoding="sync" className={styles.photo} />
         <div className={styles.framing} />
         <m.div data-valley-shade className={styles.shade} style={{ opacity: reduced ? 0.34 : darkness }} />
         <m.div data-valley-amber className={styles.amber} style={{ opacity: reduced ? 0.08 : warmth }} />
         <m.div data-valley-mist className={styles.mist} style={{ opacity: reduced ? 0.08 : fog, y: reduced ? "0%" : fogY }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={MIST[1]} alt="" decoding="async" />
+          <img src={MIST[1]} alt="" decoding="sync" />
         </m.div>
       </m.div>
       <m.div data-valley-retreat className={styles.retreat} style={{ opacity: reduced || gallery ? 0 : retreat }} />

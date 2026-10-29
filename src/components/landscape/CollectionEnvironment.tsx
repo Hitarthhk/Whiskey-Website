@@ -64,7 +64,7 @@ export function CollectionEnvironment({ active, opacity, reduced, world, shift, 
           <picture>
           <source media="(max-width: 899px)" srcSet={COLLECTION_ENVIRONMENTS[id].src.replace(".webp", "-mobile.webp")} />
           <img src={COLLECTION_ENVIRONMENTS[id].src} alt="" width={1672} height={941}
-            loading="eager" decoding="async" />
+            loading="eager" decoding="sync" />
           </picture>
         </m.div>
       ))}
