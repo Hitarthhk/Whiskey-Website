@@ -137,3 +137,7 @@
     animation: none;
   }
 }
+
+/* Faded with the scroll: composited rather than repainted. */
+.copy,
+.cue { will-change: transform, opacity; }

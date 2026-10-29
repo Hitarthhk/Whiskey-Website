@@ -92,9 +92,17 @@ export class Soundscape {
 
   get playing() { return this.on; }
 
+  /** Builds the audio graph silently. Creating the context costs a few hundred
+   * milliseconds on some systems, so the age gate does it on press, before
+   * its exit animation starts. Must run inside a user gesture. */
+  prepare() {
+    if (!this.ctx) this.build();
+    void this.ctx!.resume();
+  }
+
   /** Must run inside a user gesture (browsers, iOS especially, require it). */
   start() {
-    if (!this.ctx) this.build();
+    this.prepare();
     const ctx = this.ctx!;
     void ctx.resume();
     this.on = true;

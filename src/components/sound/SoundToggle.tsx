@@ -19,6 +19,12 @@ const started = new Set<() => void>();
  * "Yes" click, the gesture browsers require to unlock audio. A visitor who
  * has turned the sound off before keeps that choice.
  */
+/** Pressing "Yes" (before the click) builds the silent audio graph early, so
+ * its cost never lands on the gate's exit animation. */
+export function prepareSound() {
+  if (stored() !== "off" && !engine?.playing) getEngine().prepare();
+}
+
 export function enterWithSound() {
   if (stored() === "off" || engine?.playing) return;
   getEngine().start();

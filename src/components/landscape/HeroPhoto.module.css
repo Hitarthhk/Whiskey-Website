@@ -110,3 +110,10 @@
       linear-gradient(180deg, rgba(9, 14, 20, 0.3) 0%, transparent 35%);
   }
 }
+
+/* Moved or faded on every scroll frame (or breathing): own GPU layers, so
+   the browser composites the change instead of repainting the scene. */
+.sky,
+.sun { will-change: transform; }
+.light,
+.scrim { will-change: opacity; }

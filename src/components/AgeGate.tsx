@@ -6,7 +6,7 @@ import { useScrollLock } from "./useScrollLock";
 import { brand, informationPages } from "@/content/site";
 import { Emblem } from "./Emblem";
 import { HimalayanCameraDive } from "./transition/HimalayanCameraDive";
-import { enterWithSound } from "./sound/SoundToggle";
+import { enterWithSound, prepareSound } from "./sound/SoundToggle";
 import styles from "./AgeGate.module.css";
 
 type Status = "pending" | "denied" | "exiting" | "entered";
@@ -94,7 +94,7 @@ export function AgeGate({ children }: { children: ReactNode }) {
                     Are you of legal drinking age in your place of residence?
                   </h1>
                   <div data-gate-item className={styles.actions}>
-                    <button ref={yesBtn} className={styles.btn} onClick={confirm} disabled={status === "exiting"}>
+                    <button ref={yesBtn} className={styles.btn} onPointerDown={prepareSound} onClick={confirm} disabled={status === "exiting"}>
                       Yes, I am
                     </button>
                     <button className={`${styles.btn} ${styles.ghost}`} onClick={() => setStatus("denied")} disabled={status === "exiting"}>

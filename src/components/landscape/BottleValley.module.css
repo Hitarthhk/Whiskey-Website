@@ -55,3 +55,13 @@
   }
   .mist { height: 25%; }
 }
+
+/* Faded or moved on every scroll frame: each is its own GPU layer, so the
+   browser applies the change instead of repainting the showcase. Chrome on
+   Mac could not always finish that repaint when GPU memory ran short and
+   dropped the valley for a frame. */
+.landscape,
+.shade,
+.amber,
+.retreat { will-change: opacity; }
+.mist { will-change: transform, opacity; }

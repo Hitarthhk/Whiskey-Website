@@ -188,3 +188,10 @@
   gap: 16px;
   max-width: 560px;
 }
+
+/* Scrubbed on every scroll frame: own GPU layers, composited rather than
+   repainted (see BottleValley.module.css). */
+.visualLayer { will-change: opacity; }
+.mist,
+.halo,
+.step { will-change: transform, opacity; }
