@@ -13,7 +13,6 @@ npm test           # starts a temporary production server; run build first
 npm run test:transition # isolated Motion timeline previews in local Chrome; run build first
 npm run test:handoff # real scroll-engine/reference-image previews; run build first
 node scripts/bake-assets.mjs   # regenerate emblem, fallbacks and label textures
-node scripts/render-scenes.mjs # re-render the Himalayan scenes (needs `npm run dev` running and Chrome)
 ```
 
 ## Pages
@@ -72,7 +71,7 @@ Performance: canvases mount only when near the viewport and render only while vi
 
 ## Himalayan scenes
 
-The age gate and the hero use a procedural Himalayan range (`src/three/himalaya`: shared terrain and light, the gate frames, the hero’s depth layers). It is rendered **ahead of time** by `scripts/render-scenes.mjs` (through the development-only page `/dev/scenes`) into `public/media/scenes/{landscape,portrait}`, so visitors download small images instead of computing anything: the gate appears with the first paint and the gate → hero transition is plain image crossfades. Re-run the script after changing the terrain, light or layer code.
+The age gate and the hero are photographs (`public/media/photography`): the gate's night range (`age-gate-himalaya.webp`) dissolves into the hero's sunset (`hero-himalaya-sunset.webp`) through separate mist textures (`components/transition/HimalayanCameraDive.tsx`, `components/landscape/HeroPhoto.tsx`).
 
 ## Brand assets
 
